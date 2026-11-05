@@ -69,6 +69,7 @@ jobs:
           username: ${{ secrets.GCP_SSH_USERNAME }}
           key: ${{ secrets.GCP_SSH_KEY }}
           script: |
+            set -e
             cd ~/planmate
             sudo docker-compose pull discovery
             sudo docker-compose up -d --remove-orphans discovery
