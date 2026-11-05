@@ -1,0 +1,44 @@
+{
+  "_embedded": {
+    "events": [
+      {
+        "id": "G5vYZ9Kf1AbC",
+        "name": "Jazz Night with the Munich Big Band",
+        "url": "https://www.ticketmaster.de/event/jazz-night",
+        "info": "Doors open at 18:30.",
+        "pleaseNote": "No re-entry.",
+        "dates": {
+          "start": { "localDate": "2026-11-20", "localTime": "19:00:00", "dateTime": "2026-11-20T18:00:00Z" },
+          "timezone": "Europe/Berlin",
+          "status": { "code": "onsale" }
+        },
+        "classifications": [ { "segment": { "name": "Music" }, "genre": { "name": "Jazz" }, "family": false } ],
+        "_embedded": {
+          "venues": [ {
+            "name": "Jazzclub Unterfahrt",
+            "postalCode": "81675",
+            "address": { "line1": "Einsteinstraße 42" },
+            "city": { "name": "München" },
+            "country": { "name": "Germany" }
+          } ]
+        }
+      },
+      {
+        "id": "G5vYZ9Kf2Cancel",
+        "name": "Cancelled Show",
+        "dates": {
+          "start": { "localDate": "2026-11-21", "localTime": "20:00:00" },
+          "timezone": "Europe/Berlin",
+          "status": { "code": "cancelled" }
+        },
+        "classifications": [ { "segment": { "name": "Arts & Theatre" }, "genre": { "name": "Comedy" }, "family": true } ]
+      },
+      {
+        "id": "G5vYZ9Kf3TBA",
+        "name": "Date to be announced",
+        "dates": { "start": { "localDate": "2026-12-01", "timeTBA": true }, "status": { "code": "onsale" } }
+      }
+    ]
+  },
+  "page": { "size": 100, "totalElements": 3, "totalPages": 1, "number": 0 }
+}

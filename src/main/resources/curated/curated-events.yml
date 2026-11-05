@@ -1,0 +1,28 @@
+# Hand-picked events PlanMate shows that no API provides: Steam sales, game releases and other one-off events.
+#
+# Discovery reads this file on its schedule (discovery.sources.curated.cron) and publishes what changed.
+# On the server, point discovery.sources.curated.file (CURATED_EVENTS_FILE) at a mounted copy, e.g.
+# file:/config/curated-events.yml, to edit it without building a new image.
+#
+# Each event:
+#   id:          stable and unique, lower case letters, digits and dashes. Never change it: it identifies the event.
+#   title:       required.
+#   description: optional; the AI turns it into a short blurb.
+#   start / end: ISO date-times with time zone, e.g. 2026-12-18T19:00:00+01:00 (end is optional).
+#   location:    optional; name, street, zipcode, city, country. Use a name like "Online (Steam)" for online events.
+#   tags:        optional, e.g. ["#gaming", "#sale"].
+#   url:         optional, where people find out more.
+#   cancelled:   optional, true marks it cancelled in the app.
+# Removing an event from the file cancels it in the app after 24 hours (if it has not happened yet).
+#
+# Example:
+#   - id: steam-winter-sale-2026
+#     title: Steam Winter Sale 2026
+#     description: Steam's big end-of-year sale with discounts across the store.
+#     start: 2026-12-18T19:00:00+01:00
+#     end: 2027-01-02T19:00:00+01:00
+#     location: { name: Online (Steam) }
+#     tags: ["#gaming", "#sale"]
+#     url: https://store.steampowered.com
+
+events: []

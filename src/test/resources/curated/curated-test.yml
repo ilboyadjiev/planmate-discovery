@@ -1,0 +1,13 @@
+events:
+  - id: steam-winter-sale-2026
+    title: Steam Winter Sale 2026
+    description: Steam's big end-of-year sale.
+    start: 2026-12-18T19:00:00+01:00
+    end: 2027-01-02T19:00:00+01:00
+    location: { name: Online (Steam) }
+    tags: ["#gaming", "#sale"]
+    url: https://store.steampowered.com
+  - id: some-release
+    title: A game release
+    start: 2026-12-04T00:00:00+01:00
+    cancelled: true

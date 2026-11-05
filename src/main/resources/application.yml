@@ -1,0 +1,81 @@
+spring:
+  application:
+    name: planmate-discovery-service
+  threads:
+    virtual:
+      enabled: true
+  http:
+    clients:
+      # For the event sources and Gemini
+      connect-timeout: 10s
+      read-timeout: 60s
+  mongodb:
+    # Its own "discovery" database on the shared MongoDB, with a user that can only use that database
+    uri: ${DISCOVERY_MONGODB_URI:mongodb://localhost:27017/planmate_discovery}
+  data:
+    mongodb:
+      auto-index-creation: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        delivery.timeout.ms: 30000
+        request.timeout.ms: 15000
+
+server:
+  port: ${PORT:8081}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+discovery:
+  # An event its source stopped listing counts as cancelled after this long (only while the source fetches fine)
+  stale-after: 24h
+  run-on-startup: true
+
+  sources:
+    ticketmaster:
+      enabled: ${TICKETMASTER_ENABLED:true}
+      # Every 6 hours, at a quarter past
+      cron: "0 15 */6 * * *"
+      api-key: ${TICKETMASTER_API_KEY:}
+      cities: [ "Munich" ]
+      country-code: DE
+      look-ahead: 60d
+      page-size: 100
+      max-pages: 5
+    curated:
+      enabled: ${CURATED_ENABLED:true}
+      # Once a day at 03:30
+      cron: "0 30 3 * * *"
+      file: ${CURATED_EVENTS_FILE:classpath:curated/curated-events.yml}
+
+  ai:
+    enabled: ${DISCOVERY_AI_ENABLED:true}
+    # Discovery's own free-tier key, separate from the backend's
+    api-key: ${GEMINI_DISCOVERY_API_KEY:}
+    model: ${GEMINI_DISCOVERY_MODEL:gemini-3.5-flash-lite}
+    batch-size: 15
+    daily-limit: 300
+    pause-between-requests: 5s
+    prompt: classpath:prompts/event-description-refinement-prompt.txt
+
+  topics:
+    events: discovery.events
+    dead-letter: discovery.events.dlq
+    partitions: 3
+
+  outbox:
+    publish-interval: 5s
+    batch-size: 100
