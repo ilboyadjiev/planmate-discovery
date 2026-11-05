@@ -28,11 +28,15 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpServerErrorException;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mongodb.MongoDBContainer;
 import org.testcontainers.redpanda.RedpandaContainer;
 
+import com.planmate.discovery.ai.AiBudget;
 import com.planmate.discovery.ai.RefinementInput;
 import com.planmate.discovery.ai.Refiner;
 import com.planmate.discovery.model.Location;
@@ -56,6 +60,7 @@ import tools.jackson.databind.json.JsonMapper;
 		"discovery.sources.curated.enabled=false",
 		"discovery.ai.api-key=test-key",
 		"discovery.ai.pause-between-requests=0s",
+		"discovery.ai.retry-delays=0s,0s",
 		"discovery.ai.batch-size=2",
 		"discovery.outbox.initial-delay=1h",
 		"discovery.outbox.publish-interval=1h" })
@@ -102,10 +107,17 @@ class DiscoveryIntegrationTest {
 		final AtomicInteger calls = new AtomicInteger();
 		final AtomicInteger events = new AtomicInteger();
 		boolean failing;
+		/** Answers 503 "high demand" this many times before it answers. */
+		int busyTimes;
 
 		@Override
 		public Map<String, RefinedText> refine(List<RefinementInput> batch) {
 			calls.incrementAndGet();
+			if (busyTimes > 0) {
+				busyTimes--;
+				throw HttpServerErrorException.create(HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable",
+						HttpHeaders.EMPTY, "{\"error\":{\"code\":503}}".getBytes(), null);
+			}
 			events.addAndGet(batch.size());
 			if (failing) {
 				throw new IllegalStateException("quota exceeded");
@@ -132,6 +144,7 @@ class DiscoveryIntegrationTest {
 	@Autowired FakeRefiner ai;
 	@Autowired MovableClock clock;
 	@Autowired JsonMapper json;
+	@Autowired AiBudget budget;
 
 	private KafkaConsumer<String, String> consumer;
 
@@ -141,6 +154,7 @@ class DiscoveryIntegrationTest {
 		source.events.clear();
 		source.failing = false;
 		ai.failing = false;
+		ai.busyTimes = 0;
 		ai.calls.set(0);
 		ai.events.set(0);
 		clock.now = Instant.parse("2026-11-05T10:00:00Z");
@@ -317,5 +331,48 @@ class DiscoveryIntegrationTest {
 		assertThat(publisher.publishWaiting()).isEqualTo(1);
 		assertThat(outbox.findById("test-1:1").orElseThrow().getPublishedAt()).isNotNull();
 		assertThat(publisher.publishWaiting()).isZero();
+	}
+
+	@Test
+	void aBusyAiIsAskedAgainAndAnswersInTheSameRun() {
+		ai.busyTimes = 2;
+		source.events.add(event("1", "Jazz Night", "Live jazz.", "2026-11-20T18:00:00Z"));
+		List<ConsumerRecord<String, String>> first = runAndPublish();
+		assertThat(message(first.get(0)).path("event").path("description").asString()).startsWith("Refined: Jazz Night");
+		assertThat(ai.calls.get()).isEqualTo(3);
+		assertThat(budget.used()).isEqualTo(1);
+	}
+
+	@Test
+	void aBusyAiStopsTheRunsRequestsAndFailedRequestsDoNotCountAgainstTheBudget() {
+		ai.busyTimes = 100;
+		for (int i = 1; i <= 5; i++) {
+			source.events.add(event(String.valueOf(i), "Show " + i, "Text " + i, "2026-11-20T18:00:00Z"));
+		}
+		List<ConsumerRecord<String, String>> first = runAndPublish();
+		assertThat(first).hasSize(5); // published with their own text
+		assertThat(ai.calls.get()).isEqualTo(3); // the first batch, asked again twice; the other batches not at all
+		assertThat(budget.used()).isZero();
+		assertThat(mongoTemplate.findAll(TrackedEvent.class)).allMatch(TrackedEvent::isRefinementPending);
+
+		ai.busyTimes = 0;
+		assertThat(runAndPublish()).hasSize(5);
+		assertThat(budget.used()).isEqualTo(5);
+	}
+
+	@Test
+	void ofAShowListedOncePerDateOnlyTheNextThreeDatesAreTakenIn() {
+		for (int day = 10; day <= 14; day++) {
+			source.events.add(event("comedy-" + day, "Comedy. Dinner. Show.", "Dinner and comedy.", "2026-11-" + day + "T18:00:00Z"));
+		}
+		source.events.add(event("jazz", "Jazz Night", "Live jazz.", "2026-11-20T18:00:00Z"));
+
+		assertThat(runAndPublish()).extracting(ConsumerRecord::key)
+				.containsExactlyInAnyOrder("test-comedy-10", "test-comedy-11", "test-comedy-12", "test-jazz");
+		assertThat(runAndPublish()).isEmpty();
+
+		// The first date has passed: the next one comes in
+		clock.now = Instant.parse("2026-11-10T23:00:00Z");
+		assertThat(runAndPublish()).extracting(ConsumerRecord::key).containsExactly("test-comedy-13");
 	}
 }

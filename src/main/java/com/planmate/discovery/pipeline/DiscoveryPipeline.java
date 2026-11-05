@@ -3,6 +3,8 @@ package com.planmate.discovery.pipeline;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +42,8 @@ import tools.jackson.databind.json.JsonMapper;
  * 3. Send only new events and events whose title or description changed to the AI (plus ones still waiting for it).
  * 4. Save a message for every new, changed or cancelled event to the outbox, then its new state. OutboxPublisher
  *    sends the messages to discovery.events.
+ *
+ * Of a show listed once per date (same title and venue), only the next maxPerSeries dates are taken in.
  *
  * Unchanged data therefore publishes nothing and asks the AI nothing.
  */
@@ -106,8 +110,19 @@ public class DiscoveryPipeline {
 				.collect(Collectors.toMap(TrackedEvent::getId, e -> e));
 		Map<String, ChangeType> changes = new LinkedHashMap<>();
 		Map<String, TrackedEvent> touched = new LinkedHashMap<>();
+		// Dates of the same show already published and still upcoming, so a new date only comes in while there is room
+		Map<String, Integer> perSeries = new HashMap<>();
+		for (TrackedEvent tracked : known.values()) {
+			SourceEvent e = tracked.getEvent();
+			if (tracked.getStatus() == EventStatus.ACTIVE && e != null && e.endsAt() != null && e.endsAt().isAfter(now)) {
+				perSeries.merge(seriesKey(e), 1, Integer::sum);
+			}
+		}
+		int heldBack = 0;
+		List<SourceEvent> byStart = new ArrayList<>(fetched);
+		byStart.sort(Comparator.comparing(SourceEvent::startTime, Comparator.nullsLast(Comparator.naturalOrder())));
 
-		for (SourceEvent event : fetched) {
+		for (SourceEvent event : byStart) {
 			String id = source.eventId(event.sourceId());
 			if (touched.containsKey(id)) {
 				continue; // listed twice
@@ -118,6 +133,12 @@ public class DiscoveryPipeline {
 				if (over || event.cancelledAtSource()) {
 					continue; // nothing to tell anyone about
 				}
+				int max = properties.maxPerSeries();
+				if (max > 0 && perSeries.getOrDefault(seriesKey(event), 0) >= max) {
+					heldBack++; // a later date of a show already listed: it comes in once an earlier date has passed
+					continue;
+				}
+				perSeries.merge(seriesKey(event), 1, Integer::sum);
 				tracked = new TrackedEvent(id, source.id(), event.sourceId());
 				tracked.setFirstSeenAt(now);
 				changes.put(id, ChangeType.NEW);
@@ -218,7 +239,16 @@ public class DiscoveryPipeline {
 		run.setFinishedAt(clock.instant());
 		runs.save(run);
 		log.info("Run {}", run);
+		if (heldBack > 0) {
+			log.info("{}: {} later dates of shows already listed wait until earlier dates have passed", source.id(), heldBack);
+		}
 		return run;
+	}
+
+	/** A show listed once per date: the same title at the same venue. */
+	static String seriesKey(SourceEvent e) {
+		String venue = e.location() == null || e.location().name() == null ? "" : e.location().name();
+		return (e.title() + "|" + venue).toLowerCase(Locale.ROOT).replaceAll("\\s+", " ").trim();
 	}
 
 	/** How a fetched event compares with what was known about it. */

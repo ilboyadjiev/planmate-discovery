@@ -21,10 +21,13 @@ A run (`DiscoveryPipeline`):
 2. **Classify** each event by a content hash: new, changed, unchanged, or cancelled. Cancelled means the source says
    so, or the event has been missing from 24 hours of successful fetches before it happened. Events that are over
    are set aside quietly.
+   Of a show listed once per date (same title, same venue), only the next 3 dates are taken in
+   (`discovery.max-per-series`); later dates follow as earlier ones pass.
 3. **Refine**: only new events and events whose title or description changed go to Gemini, 15 per request and at
    most 300 a day, with the prompt in `src/main/resources/prompts/`. Answers are validated against the prompt's
-   rules; invalid ones fall back to the source's text. If Gemini cannot be reached, the source text is published
-   and the event is refined on a later run.
+   rules; invalid ones fall back to the source's text. When Gemini is overloaded or rate-limited (429, 5xx) a
+   request is asked again after 10s and 30s; if it still fails, the run sends nothing more, the failed request does
+   not count against the day's budget, and the source text is published and refined on a later run.
 4. **Outbox**: every new, changed or cancelled event is saved to the `outbox` collection together with its state
    change. `OutboxPublisher` sends it to `discovery.events`, keyed by event id, and marks it published once Redpanda
    confirmed it.

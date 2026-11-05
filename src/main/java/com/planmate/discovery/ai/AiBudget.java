@@ -51,6 +51,15 @@ public class AiBudget {
 		return 0;
 	}
 
+	/** Gives back events reserved today that were never answered (the request failed). */
+	public void release(int count) {
+		if (count <= 0) {
+			return;
+		}
+		mongo.findAndModify(Query.query(Criteria.where("_id").is(today()).and("events").gte(count)),
+				new Update().inc("events", -count), org.bson.Document.class, COLLECTION);
+	}
+
 	/** Events sent to the AI today. */
 	public int used() {
 		org.bson.Document doc = mongo.findById(today(), org.bson.Document.class, COLLECTION);

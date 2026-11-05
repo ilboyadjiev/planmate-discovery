@@ -27,9 +27,9 @@ import tools.jackson.databind.json.JsonMapper;
 
 class GeminiRefinerTest {
 
-	private static final DiscoveryProperties PROPS = new DiscoveryProperties(Duration.ofHours(24), null,
+	private static final DiscoveryProperties PROPS = new DiscoveryProperties(Duration.ofHours(24), 3, null,
 			new DiscoveryProperties.Ai(true, "AI-KEY", "gemini-test-model", "https://ai.example/v1beta", 15, 300,
-					Duration.ZERO, "classpath:prompts/event-description-refinement-prompt.txt"),
+					Duration.ZERO, List.of(), "classpath:prompts/event-description-refinement-prompt.txt"),
 			null, null);
 
 	private final JsonMapper json = JsonMapper.builder().build();

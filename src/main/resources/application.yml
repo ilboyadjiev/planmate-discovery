@@ -42,6 +42,8 @@ management:
 discovery:
   # An event its source stopped listing counts as cancelled after this long (only while the source fetches fine)
   stale-after: 24h
+  # Of a show listed once per date (same title, same venue), publish only the next 3 dates; 0 = every date
+  max-per-series: 3
   run-on-startup: true
 
   sources:
@@ -69,6 +71,8 @@ discovery:
     batch-size: 15
     daily-limit: 300
     pause-between-requests: 5s
+    # When Gemini is overloaded or rate-limited: ask again after 10s, then 30s, then leave it for the next run
+    retry-delays: 10s, 30s
     prompt: classpath:prompts/event-description-refinement-prompt.txt
 
   topics:

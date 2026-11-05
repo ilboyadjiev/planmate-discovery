@@ -11,10 +11,14 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
  *
  * staleAfter: an event its source stopped returning counts as cancelled after this long, but only if the source
  * fetched successfully in the meantime.
+ *
+ * maxPerSeries: of a show listed once per date (same title at the same venue), only the next this-many dates are
+ * published; later dates follow as earlier ones pass. 0 publishes every date.
  */
 @ConfigurationProperties("discovery")
 public record DiscoveryProperties(
 		@DefaultValue("24h") Duration staleAfter,
+		@DefaultValue("3") int maxPerSeries,
 		@DefaultValue Sources sources,
 		@DefaultValue Ai ai,
 		@DefaultValue Topics topics,
@@ -44,7 +48,10 @@ public record DiscoveryProperties(
 			@DefaultValue("classpath:curated/curated-events.yml") String file) {
 	}
 
-	/** Gemini, on its own free-tier key, for short descriptions of new and changed events. */
+	/**
+	 * Gemini, on its own free-tier key, for short descriptions of new and changed events. retryDelays: how long to
+	 * wait before asking again when Gemini is overloaded or rate-limited (429, 5xx, network errors).
+	 */
 	public record Ai(
 			@DefaultValue("true") boolean enabled,
 			String apiKey,
@@ -53,6 +60,7 @@ public record DiscoveryProperties(
 			@DefaultValue("15") int batchSize,
 			@DefaultValue("300") int dailyLimit,
 			@DefaultValue("5s") Duration pauseBetweenRequests,
+			@DefaultValue({ "10s", "30s" }) List<Duration> retryDelays,
 			@DefaultValue("classpath:prompts/event-description-refinement-prompt.txt") String prompt) {
 	}
 
