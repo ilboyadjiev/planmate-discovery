@@ -29,7 +29,7 @@ class RefinementValidatorTest {
 	void theAllowedTagsComeFromThePromptItself() throws Exception {
 		String prompt = new ClassPathResource("prompts/event-description-refinement-prompt.txt").getContentAsString(StandardCharsets.UTF_8);
 		Set<String> tags = PromptTemplate.parseAllowedTags(prompt);
-		assertThat(tags).contains("#munich", "#christmasmarket", "#tradition").hasSize(30).allMatch(t -> t.startsWith("#"));
+		assertThat(tags).contains("#munich", "#christmasmarket", "#tradition").hasSize(31).allMatch(t -> t.startsWith("#"));
 	}
 
 	@Test

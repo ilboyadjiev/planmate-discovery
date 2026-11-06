@@ -1,0 +1,87 @@
+# Venue and city calendars for PlanMate discovery (WebFeedRunner). On the server this file lives at
+# ./discovery/web-feeds.yml and is read again on every run, so feeds can be added without a restart.
+#
+#   id:        short and stable; events are stored as "web-{id}-...", so never rename it (a new id = new events)
+#   name:      shown under each event ("Source: Muffatwerk")
+#   url:       the programme page, or an iCal (.ics) feed
+#   format:    auto (default): iCal, else the page's schema.org event data, else the AI reads the page
+#              ics | json-ld | ai to force one
+#   time-zone: for times without one (default Europe/Berlin)
+#   location:  the venue (or just the city), for events whose own place is missing
+#   tags:      added to every event
+#
+# Before adding a site: check that its terms allow it, that its robots.txt does (PlanMateBot follows it), that
+# the programme is in the page's HTML (not loaded later by JavaScript), and that it gives times, not only dates:
+# one-day events without a time are left out (Feierwerk and Joy Station list only dates, so they are not here). Pages read by the AI cost one AI
+# request each time their text changes (at most ai-page-reads-per-day a day).
+
+feeds:
+  # --- Munich ---
+  - id: olympiapark
+    name: Olympiapark München
+    url: https://www.olympiapark.de/de/veranstaltungen-tickets/
+    format: json-ld
+    location: { name: Olympiapark, zipcode: "80809", city: Munich, country: Germany }
+
+  - id: muffatwerk
+    name: Muffatwerk
+    url: https://www.muffatwerk.de/de/events
+    location: { name: Muffatwerk, street: Zellstraße 4, zipcode: "81667", city: Munich, country: Germany }
+
+  - id: lustspielhaus
+    name: Lustspielhaus
+    url: https://www.lustspielhaus.de/programm
+    location: { name: Lustspielhaus, street: Occamstraße 8, zipcode: "80802", city: Munich, country: Germany }
+    tags: [ "#comedy" ]
+
+  - id: kammerspiele
+    name: Münchner Kammerspiele
+    url: https://www.muenchner-kammerspiele.de/de/programm
+    location: { name: Münchner Kammerspiele, street: Maximilianstraße 26, zipcode: "80539", city: Munich, country: Germany }
+    tags: [ "#theatre" ]
+
+  - id: gasteig
+    name: Gasteig HP8
+    url: https://www.gasteig.de/en/events/
+    location: { name: Gasteig HP8, street: Hans-Preißinger-Straße 8, zipcode: "81379", city: Munich, country: Germany }
+
+  - id: milla
+    name: Milla
+    url: https://www.milla-club.de/
+    location: { name: Milla, street: Holzstraße 28, zipcode: "80469", city: Munich, country: Germany }
+    tags: [ "#nightlife" ]
+
+  # --- Sofia ---
+  - id: ndk
+    name: НДК (National Palace of Culture)
+    url: https://ndk.bg/bg/programa
+    time-zone: Europe/Sofia
+    location: { name: НДК, street: бул. България 1, zipcode: "1463", city: Sofia, country: Bulgaria }
+
+  - id: nationaltheatre-sofia
+    name: Народен театър „Иван Вазов“
+    url: https://nationaltheatre.bg/bg/programa
+    time-zone: Europe/Sofia
+    location: { name: Народен театър „Иван Вазов“, street: ул. Васил Левски 5, zipcode: "1000", city: Sofia, country: Bulgaria }
+    tags: [ "#theatre" ]
+
+  - id: opera-sofia
+    name: Софийска опера и балет
+    url: https://www.operasofia.bg/calendar
+    time-zone: Europe/Sofia
+    location: { name: Софийска опера и балет, street: ул. Врабча 1, zipcode: "1000", city: Sofia, country: Bulgaria }
+    tags: [ "#culture" ]
+
+  - id: toplocentrala
+    name: Топлоцентрала
+    url: https://toplocentrala.bg/program
+    time-zone: Europe/Sofia
+    location: { name: Топлоцентрала, city: Sofia, country: Bulgaria }
+    tags: [ "#culture" ]
+
+  - id: mixtape5
+    name: Mixtape 5
+    url: https://mixtape5.com/events
+    time-zone: Europe/Sofia
+    location: { name: Mixtape 5, city: Sofia, country: Bulgaria }
+    tags: [ "#nightlife" ]

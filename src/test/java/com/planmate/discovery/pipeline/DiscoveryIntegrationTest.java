@@ -37,6 +37,7 @@ import org.testcontainers.mongodb.MongoDBContainer;
 import org.testcontainers.redpanda.RedpandaContainer;
 
 import com.planmate.discovery.ai.AiBudget;
+import com.planmate.discovery.ai.EventExtractor;
 import com.planmate.discovery.ai.RefinementInput;
 import com.planmate.discovery.ai.Refiner;
 import com.planmate.discovery.model.Location;
@@ -46,6 +47,8 @@ import com.planmate.discovery.model.TrackedEvent;
 import com.planmate.discovery.publish.OutboxPublisher;
 import com.planmate.discovery.publish.OutboxRepository;
 import com.planmate.discovery.source.EventSource;
+import com.planmate.discovery.source.web.PageEventReader;
+import com.planmate.discovery.source.web.WebFeed;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -58,6 +61,9 @@ import tools.jackson.databind.json.JsonMapper;
 		"discovery.run-on-startup=false",
 		"discovery.sources.ticketmaster.enabled=false",
 		"discovery.sources.curated.enabled=false",
+		"discovery.sources.feeds.enabled=false",
+		"discovery.sources.tmdb.enabled=false",
+		"discovery.sources.feeds.ai-page-reads-per-day=2",
 		"discovery.ai.api-key=test-key",
 		"discovery.ai.pause-between-requests=0s",
 		"discovery.ai.retry-delays=0s,0s",
@@ -129,8 +135,25 @@ class DiscoveryIntegrationTest {
 		}
 	}
 
+	/** Stands in for Gemini reading a page: reads every "<h2>" as an event on 20 Nov at 20:00. */
+	static final class FakeExtractor implements EventExtractor {
+		final AtomicInteger calls = new AtomicInteger();
+		boolean failing;
+
+		@Override
+		public List<Extracted> extract(Input input) {
+			calls.incrementAndGet();
+			if (failing) {
+				throw new IllegalStateException("quota exceeded");
+			}
+			return input.page().lines().filter(l -> l.startsWith("Show "))
+					.map(l -> new Extracted(l.trim(), "2026-11-20T20:00", "", "", "", "", "", "", false)).toList();
+		}
+	}
+
 	@TestConfiguration
 	static class Fakes {
+		@Bean @Primary FakeExtractor fakeExtractor() { return new FakeExtractor(); }
 		@Bean @Primary MovableClock testClock() { return new MovableClock(); }
 		@Bean TestSource testSource() { return new TestSource(); }
 		@Bean @Primary FakeRefiner fakeRefiner() { return new FakeRefiner(); }
@@ -145,6 +168,8 @@ class DiscoveryIntegrationTest {
 	@Autowired MovableClock clock;
 	@Autowired JsonMapper json;
 	@Autowired AiBudget budget;
+	@Autowired PageEventReader pageReader;
+	@Autowired FakeExtractor extractor;
 
 	private KafkaConsumer<String, String> consumer;
 
@@ -157,6 +182,8 @@ class DiscoveryIntegrationTest {
 		ai.busyTimes = 0;
 		ai.calls.set(0);
 		ai.events.set(0);
+		extractor.calls.set(0);
+		extractor.failing = false;
 		clock.now = Instant.parse("2026-11-05T10:00:00Z");
 		Properties props = new Properties();
 		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, redpanda.getBootstrapServers());
@@ -374,5 +401,32 @@ class DiscoveryIntegrationTest {
 		// The first date has passed: the next one comes in
 		clock.now = Instant.parse("2026-11-10T23:00:00Z");
 		assertThat(runAndPublish()).extracting(ConsumerRecord::key).containsExactly("test-comedy-13");
+	}
+
+	@Test
+	void theAiReadsAPageOnlyWhenItsTextChangedAndWithinItsOwnDailyLimit() throws Exception {
+		WebFeed feed = new WebFeed("venue", "Venue", "https://venue.example/programm", "ai", null,
+				new Location("Venue", null, null, "Munich", "Germany"), List.of());
+		java.util.function.Function<String, org.jsoup.nodes.Document> page = shows -> org.jsoup.Jsoup.parse(
+				"<main>" + shows + "</main>", "https://venue.example/programm");
+
+		assertThat(pageReader.read(feed, page.apply("<p>Show A</p><p>Show B</p>"), clock.now)).hasSize(2);
+		assertThat(pageReader.read(feed, page.apply("<p>Show A</p><p>Show B</p>"), clock.now)).hasSize(2);
+		assertThat(extractor.calls.get()).as("an unchanged page is not read again").isEqualTo(1);
+		assertThat(budget.used()).as("page reads do not use the descriptions' budget").isZero();
+
+		// A failed read does not count
+		extractor.failing = true;
+		org.assertj.core.api.Assertions.assertThatThrownBy(() -> pageReader.read(feed, page.apply("<p>Show C</p>"), clock.now));
+		assertThat(budget.pageReadsUsed()).isEqualTo(1);
+		extractor.failing = false;
+
+		assertThat(pageReader.read(feed, page.apply("<p>Show C</p>"), clock.now)).extracting(SourceEvent::title)
+				.containsExactly("Show C");
+		// Two reads today: the next changed page waits for tomorrow (the run fails, so nothing is cancelled)
+		org.assertj.core.api.Assertions.assertThatThrownBy(() -> pageReader.read(feed, page.apply("<p>Show D</p>"), clock.now))
+				.hasMessageContaining("used up");
+		clock.advance(Duration.ofDays(1));
+		assertThat(pageReader.read(feed, page.apply("<p>Show D</p>"), clock.now)).hasSize(1);
 	}
 }

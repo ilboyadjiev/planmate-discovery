@@ -13,10 +13,12 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import com.planmate.discovery.source.EventSource;
+import com.planmate.discovery.source.web.WebFeedRunner;
 
 /**
  * Runs every enabled source on its own cron schedule from application.yml, and once shortly after start, so a new
- * deployment does not wait hours for its first data.
+ * deployment does not wait hours for its first data. The web feeds (web-feeds.yml) share one schedule and run one
+ * after the other.
  */
 @Component
 public class SourceScheduler implements SchedulingConfigurer {
@@ -25,12 +27,14 @@ public class SourceScheduler implements SchedulingConfigurer {
 
 	private final List<EventSource> sources;
 	private final DiscoveryPipeline pipeline;
+	private final WebFeedRunner feeds;
 	private final boolean runOnStartup;
 
-	public SourceScheduler(List<EventSource> sources, DiscoveryPipeline pipeline,
+	public SourceScheduler(List<EventSource> sources, DiscoveryPipeline pipeline, WebFeedRunner feeds,
 			@Value("${discovery.run-on-startup:true}") boolean runOnStartup) {
 		this.sources = sources;
 		this.pipeline = pipeline;
+		this.feeds = feeds;
 		this.runOnStartup = runOnStartup;
 	}
 
@@ -44,6 +48,12 @@ public class SourceScheduler implements SchedulingConfigurer {
 			log.info("Source {} runs on '{}'", source.id(), source.cron());
 			registrar.addTriggerTask(() -> pipeline.run(source), new CronTrigger(source.cron()));
 		}
+		if (feeds.enabled()) {
+			log.info("Web feeds run on '{}'", feeds.cron());
+			registrar.addTriggerTask(feeds::runAll, new CronTrigger(feeds.cron()));
+		} else {
+			log.info("Web feeds are off");
+		}
 	}
 
 	@EventListener(ApplicationReadyEvent.class)
@@ -51,7 +61,11 @@ public class SourceScheduler implements SchedulingConfigurer {
 		if (!runOnStartup) {
 			return;
 		}
-		Thread.ofVirtual().name("discovery-startup-run").start(() -> sources.stream()
-				.filter(EventSource::enabled).forEach(pipeline::run));
+		Thread.ofVirtual().name("discovery-startup-run").start(() -> {
+			sources.stream().filter(EventSource::enabled).forEach(pipeline::run);
+			if (feeds.enabled()) {
+				feeds.runAll();
+			}
+		});
 	}
 }

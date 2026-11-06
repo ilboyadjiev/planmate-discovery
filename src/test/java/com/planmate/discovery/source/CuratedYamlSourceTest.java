@@ -20,7 +20,7 @@ class CuratedYamlSourceTest {
 
 	private static CuratedYamlSource source(String file) {
 		DiscoveryProperties props = new DiscoveryProperties(Duration.ofHours(24), 3,
-				new DiscoveryProperties.Sources(null, new DiscoveryProperties.Curated(true, "0 0 3 * * *", file)), null, null, null);
+				new DiscoveryProperties.Sources(null, new DiscoveryProperties.Curated(true, "0 0 3 * * *", file), null, null), null, null, null);
 		return new CuratedYamlSource(props, new DefaultResourceLoader());
 	}
 

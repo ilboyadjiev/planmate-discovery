@@ -24,7 +24,27 @@ public record DiscoveryProperties(
 		@DefaultValue Topics topics,
 		@DefaultValue Outbox outbox) {
 
-	public record Sources(@DefaultValue Ticketmaster ticketmaster, @DefaultValue Curated curated) {
+	public record Sources(@DefaultValue Ticketmaster ticketmaster, @DefaultValue Curated curated,
+			@DefaultValue Feeds feeds, @DefaultValue Tmdb tmdb) {
+	}
+
+	/**
+	 * Cinema releases from The Movie Database (TMDB): the most popular films opening in each region within
+	 * lookAhead, at most maxMoviesPerRegion per region. Each region's releases are shown in its city.
+	 */
+	public record Tmdb(
+			@DefaultValue("false") boolean enabled,
+			@DefaultValue("0 15 4 * * *") String cron,
+			String apiKey,
+			@DefaultValue("https://api.themoviedb.org/3") String baseUrl,
+			List<Region> regions,
+			@DefaultValue("60d") Duration lookAhead,
+			@DefaultValue("25") int maxMoviesPerRegion,
+			@DefaultValue("100ms") Duration pause) {
+	}
+
+	/** code: ISO country (DE); language for titles and texts (de-DE); city the releases are shown in. */
+	public record Region(String code, String language, String city, String country, String timeZone) {
 	}
 
 	/** Ticketmaster Discovery API: public events in the given cities. */
@@ -46,6 +66,25 @@ public record DiscoveryProperties(
 			@DefaultValue("true") boolean enabled,
 			@DefaultValue("0 30 3 * * *") String cron,
 			@DefaultValue("classpath:curated/curated-events.yml") String file) {
+	}
+
+	/**
+	 * Calendars and event pages of venues and city listings (web-feeds.yml): iCal feeds, pages with schema.org event
+	 * data, and, when a page has neither, its text read by the AI (aiFallback). Each feed is a source of its own, run
+	 * one after the other. lookAhead: events further away are left out. maxEventsPerFeed and maxPageBytes keep a
+	 * huge or broken page from flooding PlanMate.
+	 */
+	public record Feeds(
+			@DefaultValue("true") boolean enabled,
+			@DefaultValue("0 45 5,17 * * *") String cron,
+			@DefaultValue("classpath:feeds/web-feeds.yml") String file,
+			@DefaultValue("true") boolean aiFallback,
+			@DefaultValue("40") int aiPageReadsPerDay,
+			@DefaultValue("120d") Duration lookAhead,
+			@DefaultValue("300") int maxEventsPerFeed,
+			@DefaultValue("3000000") int maxPageBytes,
+			@DefaultValue("2s") Duration pause,
+			@DefaultValue("PlanMateBot/1.0 (+https://www.planmate.org)") String userAgent) {
 	}
 
 	/**

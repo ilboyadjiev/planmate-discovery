@@ -140,7 +140,7 @@ public class RefinementService {
 	}
 
 	/** 429, 5xx and network errors pass; a wrong key or model (other 4xx) or a broken answer does not. */
-	static boolean temporary(Exception e) {
+	public static boolean temporary(Exception e) {
 		if (e instanceof RestClientResponseException response) {
 			int status = response.getStatusCode().value();
 			return status == 429 || status >= 500;

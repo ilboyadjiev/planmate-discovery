@@ -49,8 +49,9 @@ discovery:
   sources:
     ticketmaster:
       enabled: ${TICKETMASTER_ENABLED:true}
-      # Every 6 hours, at a quarter past
-      cron: "0 15 */6 * * *"
+      # Every 2 hours, at a quarter past: about 60 of the 5000 requests a day the free key allows. Only new and
+      # changed events go to the AI, so this costs no more AI than a slower schedule.
+      cron: "0 15 */2 * * *"
       api-key: ${TICKETMASTER_API_KEY:}
       cities: [ "Munich" ]
       country-code: DE
@@ -62,6 +63,32 @@ discovery:
       # Once a day at 03:30
       cron: "0 30 3 * * *"
       file: ${CURATED_EVENTS_FILE:classpath:curated/curated-events.yml}
+    tmdb:
+      enabled: ${TMDB_ENABLED:true}
+      # Daily at 04:15; about 30 requests per region (TMDB allows far more)
+      cron: "0 15 4 * * *"
+      # The "API Key" or the "API Read Access Token" from themoviedb.org/settings/api; empty keeps TMDB off
+      api-key: ${TMDB_API_KEY:}
+      look-ahead: 60d
+      max-movies-per-region: 25
+      # Each country's cinema releases, in its language, shown in its city
+      regions:
+        - { code: DE, language: de-DE, city: Munich, country: Germany, time-zone: Europe/Berlin }
+        - { code: BG, language: bg-BG, city: Sofia, country: Bulgaria, time-zone: Europe/Sofia }
+    feeds:
+      enabled: ${WEB_FEEDS_ENABLED:true}
+      # Twice a day (05:45 and 17:45); the feeds run one after the other. Programmes change slowly, and this keeps
+      # the AI's page reads low
+      cron: "0 45 5,17 * * *"
+      # Venue and city calendars; on the server: ./discovery/web-feeds.yml, read again on every run
+      file: ${WEB_FEEDS_FILE:classpath:feeds/web-feeds.yml}
+      # Pages with neither a calendar nor schema.org data are read by the AI (only when their text changed)
+      ai-fallback: true
+      ai-page-reads-per-day: 40
+      look-ahead: 120d
+      max-events-per-feed: 300
+      max-page-bytes: 3000000
+      pause: 2s
 
   ai:
     enabled: ${DISCOVERY_AI_ENABLED:true}
