@@ -85,3 +85,11 @@ feeds:
     time-zone: Europe/Sofia
     location: { name: Mixtape 5, city: Sofia, country: Bulgaria }
     tags: [ "#nightlife" ]
+
+  - id: golemiatquiz
+    name: Големият куиз
+    url: https://tockify.com/api/feeds/ics/golemiatquiz
+    format: ics
+    time-zone: Europe/Sofia
+    location: { city: Sofia, country: Bulgaria }
+    tags: [ "#quiz" ]
