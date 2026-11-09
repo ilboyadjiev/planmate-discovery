@@ -40,7 +40,7 @@ class TmdbSourceTest {
 	private static DiscoveryProperties properties(String key) {
 		DiscoveryProperties.Tmdb tmdb = new DiscoveryProperties.Tmdb(true, "0 15 4 * * *", key,
 				"https://api.themoviedb.org/3", List.of(GERMANY), Duration.ofDays(60), 25, Duration.ZERO);
-		return new DiscoveryProperties(Duration.ofHours(24), 3, new DiscoveryProperties.Sources(null, null, null, tmdb),
+		return new DiscoveryProperties(Duration.ofHours(24), 3, new DiscoveryProperties.Sources(null, null, null, tmdb, null),
 				null, null, null);
 	}
 

@@ -64,6 +64,7 @@ import tools.jackson.databind.json.JsonMapper;
 		"discovery.sources.feeds.enabled=false",
 		"discovery.sources.tmdb.enabled=false",
 		"discovery.sources.feeds.ai-page-reads-per-day=2",
+		"discovery.ai.daily-limit=300",
 		"discovery.ai.api-key=test-key",
 		"discovery.ai.pause-between-requests=0s",
 		"discovery.ai.retry-delays=0s,0s",

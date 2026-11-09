@@ -13,6 +13,7 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import com.planmate.discovery.source.EventSource;
+import com.planmate.discovery.source.google.GoogleCalendarRunner;
 import com.planmate.discovery.source.web.WebFeedRunner;
 
 /**
@@ -28,13 +29,15 @@ public class SourceScheduler implements SchedulingConfigurer {
 	private final List<EventSource> sources;
 	private final DiscoveryPipeline pipeline;
 	private final WebFeedRunner feeds;
+	private final GoogleCalendarRunner googleCalendars;
 	private final boolean runOnStartup;
 
 	public SourceScheduler(List<EventSource> sources, DiscoveryPipeline pipeline, WebFeedRunner feeds,
-			@Value("${discovery.run-on-startup:true}") boolean runOnStartup) {
+			GoogleCalendarRunner googleCalendars, @Value("${discovery.run-on-startup:true}") boolean runOnStartup) {
 		this.sources = sources;
 		this.pipeline = pipeline;
 		this.feeds = feeds;
+		this.googleCalendars = googleCalendars;
 		this.runOnStartup = runOnStartup;
 	}
 
@@ -54,6 +57,12 @@ public class SourceScheduler implements SchedulingConfigurer {
 		} else {
 			log.info("Web feeds are off");
 		}
+		if (googleCalendars.enabled()) {
+			log.info("Google calendars run on '{}'", googleCalendars.cron());
+			registrar.addTriggerTask(googleCalendars::runAll, new CronTrigger(googleCalendars.cron()));
+		} else {
+			log.info("Google calendars are off");
+		}
 	}
 
 	@EventListener(ApplicationReadyEvent.class)
@@ -65,6 +74,9 @@ public class SourceScheduler implements SchedulingConfigurer {
 			sources.stream().filter(EventSource::enabled).forEach(pipeline::run);
 			if (feeds.enabled()) {
 				feeds.runAll();
+			}
+			if (googleCalendars.enabled()) {
+				googleCalendars.runAll();
 			}
 		});
 	}

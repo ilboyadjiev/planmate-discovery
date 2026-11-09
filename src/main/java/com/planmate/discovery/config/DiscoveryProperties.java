@@ -25,7 +25,38 @@ public record DiscoveryProperties(
 		@DefaultValue Outbox outbox) {
 
 	public record Sources(@DefaultValue Ticketmaster ticketmaster, @DefaultValue Curated curated,
-			@DefaultValue Feeds feeds, @DefaultValue Tmdb tmdb) {
+			@DefaultValue Feeds feeds, @DefaultValue Tmdb tmdb, @DefaultValue GoogleCalendar googleCalendar) {
+	}
+
+	/**
+	 * Events from Google Calendars that a PlanMate ingestion account has subscribed to (e.g. a venue's published
+	 * webcal/.ics feed added to Google Calendar). The discovery service reads them with the Google Calendar API,
+	 * authorized by that account's OAuth refresh token, so it never fetches the original feed itself. One source
+	 * per calendar, credited by the calendar's name. Set up: enable the Google Calendar API, create an OAuth client,
+	 * authorize the account once for the calendar.readonly scope, and put the client id, secret and refresh token in
+	 * the environment. Only subscribe to and republish calendars the operator is entitled to.
+	 */
+	public record GoogleCalendar(
+			@DefaultValue("false") boolean enabled,
+			@DefaultValue("0 40 5,17 * * *") String cron,
+			@DefaultValue("https://oauth2.googleapis.com/token") String tokenUrl,
+			@DefaultValue("https://www.googleapis.com/calendar/v3") String apiBaseUrl,
+			String clientId,
+			String clientSecret,
+			String refreshToken,
+			List<Calendar> calendars,
+			@DefaultValue("90d") Duration lookAhead,
+			@DefaultValue("300") int maxEventsPerCalendar,
+			@DefaultValue("200ms") Duration pause) {
+	}
+
+	/**
+	 * key: short, stable id (its events are stored as "gcal-{key}-..."), never rename it. name: credited under each
+	 * event. calendarId: the Google calendar's id (often an …@group.calendar.google.com address). city/country: a
+	 * fallback place and the city tag. tags: added to every event.
+	 */
+	public record Calendar(String key, String name, String calendarId, String city, String country, String timeZone,
+			List<String> tags) {
 	}
 
 	/**

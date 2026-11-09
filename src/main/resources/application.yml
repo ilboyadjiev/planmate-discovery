@@ -82,13 +82,38 @@ discovery:
       cron: "0 45 5,17 * * *"
       # Venue and city calendars; on the server: ./discovery/web-feeds.yml, read again on every run
       file: ${WEB_FEEDS_FILE:classpath:feeds/web-feeds.yml}
-      # Pages with neither a calendar nor schema.org data are read by the AI (only when their text changed)
+      # Pages with neither a calendar nor schema.org data are read by the AI (only when their text changed).
+      # Shares the Gemini free-tier quota with the description refinement below (discovery.ai.daily-limit).
       ai-fallback: true
-      ai-page-reads-per-day: 40
+      ai-page-reads-per-day: ${DISCOVERY_AI_PAGE_READS_PER_DAY:200}
       look-ahead: 120d
       max-events-per-feed: 300
       max-page-bytes: 3000000
       pause: 2s
+
+    # Google calendars the PlanMate ingestion account has subscribed to (e.g. a venue's webcal feed added to that
+    # account's Google Calendar). Read with the Google Calendar API so the service never fetches the source site.
+    # Off until the OAuth credentials are set. Only subscribe to and republish calendars you are entitled to.
+    google-calendar:
+      enabled: ${GOOGLE_CALENDAR_ENABLED:false}
+      # Twice a day; Google refreshes a subscribed calendar on its own schedule (often hours), so there is no point
+      # polling more often
+      cron: "0 40 5,17 * * *"
+      # OAuth client for the ingestion account, and its refresh token (calendar.readonly). All empty keeps it off.
+      client-id: ${GOOGLE_CALENDAR_CLIENT_ID:}
+      client-secret: ${GOOGLE_CALENDAR_CLIENT_SECRET:}
+      refresh-token: ${GOOGLE_CALENDAR_REFRESH_TOKEN:}
+      look-ahead: 90d
+      max-events-per-calendar: 300
+      calendars:
+        # "Големият куиз" pub quizzes, subscribed into the technical account's Google Calendar
+        - key: golemiatquiz
+          name: Големият куиз
+          calendar-id: ${GOLEMIATQUIZ_CALENDAR_ID:5lidssptt6am6221r7a33irhjakcd9eb@import.calendar.google.com}
+          city: Sofia
+          country: Bulgaria
+          time-zone: Europe/Sofia
+          tags: [ "#quiz" ]
 
   ai:
     enabled: ${DISCOVERY_AI_ENABLED:true}
@@ -96,7 +121,8 @@ discovery:
     api-key: ${GEMINI_DISCOVERY_API_KEY:}
     model: ${GEMINI_DISCOVERY_MODEL:gemini-3.5-flash-lite}
     batch-size: 15
-    daily-limit: 300
+    # Gemini requests a day for descriptions (shares the free-tier quota with the feeds' AI page reads above)
+    daily-limit: ${DISCOVERY_AI_DAILY_LIMIT:1000}
     pause-between-requests: 5s
     # When Gemini is overloaded or rate-limited: ask again after 10s, then 30s, then leave it for the next run
     retry-delays: 10s, 30s

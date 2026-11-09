@@ -34,7 +34,7 @@ class TicketmasterSourceTest {
 		DiscoveryProperties.Ticketmaster tm = new DiscoveryProperties.Ticketmaster(true, "0 0 * * * *", "KEY",
 				"https://app.ticketmaster.com/discovery/v2", List.of("Munich"), "DE", Duration.ofDays(60), 100, 5,
 				Duration.ZERO);
-		return new DiscoveryProperties(Duration.ofHours(24), 3, new DiscoveryProperties.Sources(tm, null, null, null), null, null, null);
+		return new DiscoveryProperties(Duration.ofHours(24), 3, new DiscoveryProperties.Sources(tm, null, null, null, null), null, null, null);
 	}
 
 	private static String fixture() throws Exception {
@@ -91,7 +91,7 @@ class TicketmasterSourceTest {
 		DiscoveryProperties.Ticketmaster noKey = new DiscoveryProperties.Ticketmaster(true, "0 0 * * * *", " ",
 				"https://x", List.of("Munich"), "DE", Duration.ofDays(1), 10, 1, Duration.ZERO);
 		DiscoveryProperties props = new DiscoveryProperties(Duration.ofHours(24), 3,
-				new DiscoveryProperties.Sources(noKey, null, null, null), null, null, null);
+				new DiscoveryProperties.Sources(noKey, null, null, null, null), null, null, null);
 		assertThat(new TicketmasterSource(props, RestClient.builder(), CLOCK).enabled()).isFalse();
 	}
 }

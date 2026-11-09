@@ -90,7 +90,7 @@ class WebFeedSourceTest {
 	@Test
 	void theShippedFeedFileIsValid() throws Exception {
 		DiscoveryProperties properties = new DiscoveryProperties(Duration.ofHours(24), 3,
-				new DiscoveryProperties.Sources(null, null, config(true, Duration.ofDays(120), 300), null), null, null, null);
+				new DiscoveryProperties.Sources(null, null, config(true, Duration.ofDays(120), 300), null, null), null, null, null);
 		WebFeedRunner runner = new WebFeedRunner(properties, new DefaultResourceLoader(), mock(DiscoveryPipeline.class),
 				fetcher, ai, NOW);
 
