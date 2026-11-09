@@ -85,3 +85,42 @@ feeds:
     time-zone: Europe/Sofia
     location: { name: Mixtape 5, city: Sofia, country: Bulgaria }
     tags: [ "#nightlife" ]
+
+  - id: tba-sofia
+    name: Театър „Българска армия“
+    url: http://www.tba.art.bg/programabg.php
+    format: ai
+    time-zone: Europe/Sofia
+    location: { name: Театър „Българска армия“, street: ул. Раковски 98, city: Sofia, country: Bulgaria }
+    tags: [ "#theatre" ]
+
+  - id: comedyclub-sofia
+    name: The Comedy Club Sofia
+    url: https://thecomedyclub.bg/
+    format: ai
+    time-zone: Europe/Sofia
+    location: { name: The Comedy Club Sofia, city: Sofia, country: Bulgaria }
+    tags: [ "#comedy" ]
+
+  - id: sofiastage
+    name: Sofia Stage
+    url: https://sofiastage.com/
+    format: ai
+    time-zone: Europe/Sofia
+    location: { city: Sofia, country: Bulgaria }
+    tags: [ "#culture" ]
+
+  # Aggregators: many venues, so no feed-wide tag; the AI reads each event's own place (city tag added from Sofia)
+  - id: visitsofia
+    name: Visit Sofia
+    url: https://www.visitsofia.bg/bg/%D1%82%D0%B0%D0%B7%D0%B8-%D1%81%D0%B5%D0%B4%D0%BC%D0%B8%D1%86%D0%B0
+    format: ai
+    time-zone: Europe/Sofia
+    location: { city: Sofia, country: Bulgaria }
+
+  - id: go-sofia
+    name: Go Sofia
+    url: https://www.go-sofia.com/
+    format: ai
+    time-zone: Europe/Sofia
+    location: { city: Sofia, country: Bulgaria }

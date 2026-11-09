@@ -77,19 +77,22 @@ discovery:
         - { code: BG, language: bg-BG, city: Sofia, country: Bulgaria, time-zone: Europe/Sofia }
     feeds:
       enabled: ${WEB_FEEDS_ENABLED:true}
-      # Twice a day (05:45 and 17:45); the feeds run one after the other. Programmes change slowly, and this keeps
-      # the AI's page reads low
-      cron: "0 45 5,17 * * *"
+      # Every 4 hours (00:20, 04:20, … 20:20); the feeds run one after the other. A page is only read by the AI when
+      # its text changed, so running more often catches new events sooner without many more reads.
+      cron: "0 20 */4 * * *"
       # Venue and city calendars; on the server: ./discovery/web-feeds.yml, read again on every run
       file: ${WEB_FEEDS_FILE:classpath:feeds/web-feeds.yml}
       # Pages with neither a calendar nor schema.org data are read by the AI (only when their text changed).
-      # Shares the Gemini free-tier quota with the description refinement below (discovery.ai.daily-limit).
+      # Gemini free tier (Flash-Lite) allows 500 requests/day and 15/min, shared with the description refinement
+      # below. Page reads (≈1 request each) plus refinement (daily-limit events ÷ batch-size requests) stay well
+      # under that: e.g. 300 + ~67 ≈ 367/day. Raise via env if you add many more AI feeds.
       ai-fallback: true
-      ai-page-reads-per-day: ${DISCOVERY_AI_PAGE_READS_PER_DAY:200}
+      ai-page-reads-per-day: ${DISCOVERY_AI_PAGE_READS_PER_DAY:300}
       look-ahead: 120d
       max-events-per-feed: 300
       max-page-bytes: 3000000
-      pause: 2s
+      # 4s between feeds keeps AI page reads under the 15 requests/minute free-tier limit even when many changed
+      pause: 4s
 
     # Google calendars the PlanMate ingestion account has subscribed to (e.g. a venue's webcal feed added to that
     # account's Google Calendar). Read with the Google Calendar API so the service never fetches the source site.
