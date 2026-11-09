@@ -15,8 +15,9 @@ import com.planmate.discovery.config.DiscoveryProperties;
 
 /**
  * At most dailyLimit events a day go to the AI for descriptions, and at most aiPageReadsPerDay web pages are read
- * by it (collection "ai_usage", one document per UTC day). Both are counted before sending, so even a crash right
- * after sending never goes over a limit.
+ * by it (collection "ai_usage", one document per UTC day). Descriptions are reserved before sending (so a crash
+ * right after sending never goes over the limit). Page reads are counted only after the AI answers: a failed or
+ * skipped read costs nothing, and a crash before the answer can never leak a reservation and wedge the budget.
  */
 @Component
 public class AiBudget {
@@ -51,14 +52,15 @@ public class AiBudget {
 		return used("events");
 	}
 
-	/** Reserves one web page read for today; false when today's page reads are used up. */
-	public boolean reservePageRead() {
-		return reserve("pages", 1, pageReadLimit) == 1;
+	/** True while today still has room for a page read. Checked before the read; the read is then counted, only if
+	 *  it succeeds, with recordPageRead — so nothing is reserved up front and a failed read can never leak budget. */
+	public boolean canReadPage() {
+		return pageReadLimit > 0 && used("pages") < pageReadLimit;
 	}
 
-	/** Gives back a page read that failed. */
-	public void releasePageRead() {
-		release("pages", 1);
+	/** Counts one page actually read by the AI today (call only after the AI answered). */
+	public void recordPageRead() {
+		mongo.upsert(Query.query(Criteria.where("_id").is(today())), new Update().inc("pages", 1), COLLECTION);
 	}
 
 	/** Web pages read by the AI today. */

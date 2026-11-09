@@ -85,9 +85,9 @@ discovery:
       # Pages with neither a calendar nor schema.org data are read by the AI (only when their text changed).
       # Gemini free tier (Flash-Lite) allows 500 requests/day and 15/min, shared with the description refinement
       # below. Page reads (≈1 request each) plus refinement (daily-limit events ÷ batch-size requests) stay well
-      # under that: e.g. 300 + ~67 ≈ 367/day. Raise via env if you add many more AI feeds.
+      # under that: e.g. 400 + ~67 ≈ 467/day. Raise via env if you add many more AI feeds.
       ai-fallback: true
-      ai-page-reads-per-day: ${DISCOVERY_AI_PAGE_READS_PER_DAY:300}
+      ai-page-reads-per-day: ${DISCOVERY_AI_PAGE_READS_PER_DAY:400}
       look-ahead: 120d
       max-events-per-feed: 300
       max-page-bytes: 3000000

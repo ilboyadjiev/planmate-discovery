@@ -110,7 +110,7 @@ public record DiscoveryProperties(
 			@DefaultValue("0 45 5,17 * * *") String cron,
 			@DefaultValue("classpath:feeds/web-feeds.yml") String file,
 			@DefaultValue("true") boolean aiFallback,
-			@DefaultValue("40") int aiPageReadsPerDay,
+			@DefaultValue("400") int aiPageReadsPerDay,
 			@DefaultValue("120d") Duration lookAhead,
 			@DefaultValue("300") int maxEventsPerFeed,
 			@DefaultValue("3000000") int maxPageBytes,

@@ -76,17 +76,14 @@ public class PageEventReader {
 		if (!available()) {
 			throw new IllegalStateException("the page has no calendar or event data, and the AI is off");
 		}
-		if (!budget.reservePageRead()) {
+		if (!budget.canReadPage()) {
 			throw new IllegalStateException("today's AI page reads are used up; the page is read on a later run");
 		}
-		List<EventExtractor.Extracted> answer;
-		try {
-			answer = ask(new EventExtractor.Input(page.location(), feed.name(),
-					LocalDate.ofInstant(now, feed.zone()).toString(), feed.zone().getId(), text));
-		} catch (Exception e) {
-			budget.releasePageRead();
-			throw e;
-		}
+		// Ask first, count after: a read that throws costs no budget, and a crash mid-read can never leak a
+		// reservation that would wedge the day's budget (AiBudget).
+		List<EventExtractor.Extracted> answer = ask(new EventExtractor.Input(page.location(), feed.name(),
+				LocalDate.ofInstant(now, feed.zone()).toString(), feed.zone().getId(), text));
+		budget.recordPageRead();
 		List<SourceEvent> events = accept(answer, feed, text, page.location());
 		if (events.size() < answer.size()) {
 			log.info("web-{}: kept {} of the {} events the AI read; the rest did not match the page", feed.id(),
