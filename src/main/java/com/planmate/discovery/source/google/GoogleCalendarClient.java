@@ -6,11 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.planmate.discovery.config.DiscoveryProperties;
@@ -27,6 +30,8 @@ import tools.jackson.databind.JsonNode;
  */
 @Component
 public class GoogleCalendarClient {
+
+	private static final Logger log = LoggerFactory.getLogger(GoogleCalendarClient.class);
 
 	/** Google caps a page at 2500; we ask for less and stop at maxEventsPerCalendar. */
 	private static final int PAGE_SIZE = 250;
@@ -57,10 +62,26 @@ public class GoogleCalendarClient {
 		form.add("client_secret", config.clientSecret().trim());
 		form.add("refresh_token", config.refreshToken().trim());
 		form.add("grant_type", "refresh_token");
-		JsonNode res = http.post().uri(config.tokenUrl()).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.body(form).retrieve().body(JsonNode.class);
+		JsonNode res;
+		try {
+			res = http.post().uri(config.tokenUrl()).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+					.body(form).retrieve().body(JsonNode.class);
+		} catch (RestClientResponseException e) {
+			String body = e.getResponseBodyAsString();
+			if (body != null && body.contains("invalid_grant")) {
+				// A lapsed token is an operator action, not a transient error: make it unmistakable in the logs.
+				log.error("Google rejected the refresh token (invalid_grant): it has expired or been revoked. "
+						+ "Re-authorize the PlanMate ingestion account and set GOOGLE_CALENDAR_REFRESH_TOKEN again. "
+						+ "In Testing mode Google expires the refresh token after 7 days (see docs/DISCOVERY_SETUP.md). "
+						+ "Google calendar ingestion is paused until then.");
+			} else {
+				log.error("Google refused the refresh-token request ({}): {}", e.getStatusCode(), body);
+			}
+			throw new GoogleAuthException("Google refresh-token exchange failed", e);
+		}
 		String token = res == null ? null : text(res, "access_token");
 		if (token == null) {
+			log.error("Google's token response had no access_token — check the OAuth client id and secret");
 			throw new IllegalStateException("Google did not return an access token (check the OAuth credentials)");
 		}
 		long expiresIn = res.path("expires_in").asLong(3600L);

@@ -1,11 +1,13 @@
 package com.planmate.discovery.source.google;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.time.Duration;
@@ -15,6 +17,7 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
@@ -56,6 +59,23 @@ class GoogleCalendarClientTest {
 				Instant.parse("2026-11-10T00:00:00Z"), Instant.parse("2027-02-08T00:00:00Z"), 300, 0);
 
 		assertThat(items).extracting(n -> n.path("id").asString()).containsExactly("a", "b");
+		server.verify();
+	}
+
+	@Test
+	void anExpiredRefreshTokenFailsClearly() {
+		RestClient.Builder builder = RestClient.builder();
+		MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+		server.expect(once(), requestTo("https://oauth2.googleapis.com/token"))
+				.andRespond(withStatus(HttpStatus.BAD_REQUEST)
+						.body("{\"error\":\"invalid_grant\",\"error_description\":\"Token has been expired or revoked.\"}")
+						.contentType(MediaType.APPLICATION_JSON));
+
+		GoogleCalendarClient client = new GoogleCalendarClient(properties(), builder);
+
+		assertThatThrownBy(() -> client.listEvents("cal@x", Instant.parse("2026-11-10T00:00:00Z"),
+				Instant.parse("2027-02-08T00:00:00Z"), 300, 0))
+				.isInstanceOf(GoogleAuthException.class);
 		server.verify();
 	}
 }
