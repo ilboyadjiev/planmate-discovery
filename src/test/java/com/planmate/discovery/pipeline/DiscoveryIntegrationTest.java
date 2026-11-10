@@ -376,6 +376,20 @@ class DiscoveryIntegrationTest {
 	}
 
 	@Test
+	void refinementStillWorksAfterAPageReadCreatedTheDaysUsageDocument() {
+		// Regression: a page read first creates today's ai_usage doc with only "pages" (no "events" field). The
+		// events budget must still be spendable — not blocked for the rest of the day.
+		budget.recordPageRead();
+		assertThat(budget.remainingEvents()).isPositive();
+
+		source.events.add(event("1", "Jazz Night", "Live jazz.", "2026-11-20T18:00:00Z"));
+		List<ConsumerRecord<String, String>> published = runAndPublish();
+		assertThat(message(published.get(0)).path("event").path("description").asString()).startsWith("Refined: Jazz Night");
+		assertThat(budget.used()).isEqualTo(1);
+		assertThat(budget.pageReadsUsed()).isEqualTo(1);
+	}
+
+	@Test
 	void aBusyAiStopsTheRunsRequestsAndFailedRequestsDoNotCountAgainstTheBudget() {
 		ai.busyTimes = 100;
 		for (int i = 1; i <= 5; i++) {
