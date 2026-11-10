@@ -16,9 +16,11 @@ import com.planmate.discovery.model.Location;
  * timeZone: for times given without one (default Europe/Berlin).
  * location: the venue, or just the city, for events whose own place is missing or incomplete.
  * tags: added to every event, e.g. [ "#concert" ].
+ * ignoreRobots: skip the robots.txt check for this feed (default false). Only turn it on for a site you are
+ *   separately entitled to read, since it overrides the site's stated crawling policy.
  */
 public record WebFeed(String id, String name, String url, String format, String timeZone, Location location,
-		List<String> tags) {
+		List<String> tags, boolean ignoreRobots) {
 
 	public enum Format {
 		AUTO, ICS, JSON_LD, AI

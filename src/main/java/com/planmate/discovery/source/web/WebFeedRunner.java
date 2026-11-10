@@ -34,6 +34,8 @@ public class WebFeedRunner {
 
 	private static final YAMLMapper YAML = YAMLMapper.builder()
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+			// An omitted ignore-robots (or any absent primitive flag) means its default, not a failure.
+			.disable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES)
 			.propertyNamingStrategy(PropertyNamingStrategies.KEBAB_CASE)
 			.build();
 

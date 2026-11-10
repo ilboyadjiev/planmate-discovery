@@ -266,3 +266,111 @@ events:
       country: Bulgaria
     tags: ["#kids", "#interactive", "#music", "#sofia"]
     url: https://sofia.plays.bg/events/by-category/3music
+
+  - id: christmas-carnival-kanyon-2026
+    title: Коледен карнавал
+    description: Празничен коледен карнавал с множество атракции, музика, забавления на открито и коледен дух за цялото семейство.
+    start: 2026-11-20T10:00:00+02:00
+    end: 2026-12-23T22:00:00+02:00
+    location:
+      name: Kanyon Park
+      city: Sofia
+      country: Bulgaria
+    tags: ["#christmas", "#carnival", "#sofia", "#kids"]
+    url: https://www.facebook.com/events/kanyon-park-christmas-carnival/
+
+  - id: divino-taste-2026
+    title: DiVino.Taste 2026
+    description: Най-големият и престижен форум за българско вино. Посетителите могат да очакват дегустации на стотици вина, майсторски класове и срещи с най-добрите винопроизводители в страната.
+    start: 2026-11-27T10:00:00+02:00
+    end: 2026-11-28T20:00:00+02:00
+    location:
+      name: Интер Експо Център (IEC)
+      city: Sofia
+      country: Bulgaria
+    tags: ["#wine", "#divinotaste", "#expo", "#tasting"]
+    url: https://taste.divino.bg/
+
+  - id: fizika-na-tagata-theatre
+    title: Физика на тъгата
+    description: Изключителна театрална постановка по едноименния световнопризнат роман на Георги Господинов. Завладяващ разказ за паметта, емпатията и лабиринтите на миналото.
+    start: 2026-12-02T19:00:00+02:00
+    end: 2026-12-02T21:00:00+02:00
+    location:
+      name: Народен театър "Иван Вазов"
+      city: Sofia
+      country: Bulgaria
+    tags: ["#theatre", "#drama", "#sofia", "#ivanvazov"]
+    url: https://nationaltheatre.bg/bg/predstavlenie/fizika-na-tugata
+
+  - id: bashata-theatre-2026
+    title: Бащата
+    description: Спектакъл по прочутата пиеса на Флориан Зелер. Емоционална и въздействаща история, която изследва крехкостта на човешкото съзнание и семейните взаимоотношения.
+    start: 2026-12-03T19:00:00+02:00
+    end: 2026-12-03T21:00:00+02:00
+    location:
+      name: Народен театър "Иван Вазов"
+      city: Sofia
+      country: Bulgaria
+    tags: ["#theatre", "#drama", "#sofia", "#ivanvazov"]
+    url: https://nationaltheatre.bg/bg/predstavlenie/bashchata
+
+  - id: sofia-international-book-fair-2026
+    title: Софийски международен панаир на книгата
+    description: Традиционното мащабно литературно събитие на годината, събиращо водещи издателства, автори и читатели. Провежда се успоредно със Софийския международен литературен фестивал.
+    start: 2026-12-08T10:00:00+02:00
+    end: 2026-12-13T20:00:00+02:00
+    location:
+      name: Национален дворец на културата (НДК)
+      city: Sofia
+      country: Bulgaria
+    tags: ["#books", "#bookfair", "#literature", "#sofia"]
+    url: https://abk.bg/
+
+  - id: alice-in-wonderland-ndk
+    title: Алиса в страната на Чудесата
+    description: Зрелищен мултимедиен спектакъл за малки и големи, който пренася публиката в магическия и нереален свят на Луис Карол чрез музика, танци и визуални ефекти.
+    start: 2026-12-15T19:00:00+02:00
+    end: 2026-12-15T21:00:00+02:00
+    location:
+      name: Национален дворец на културата (НДК)
+      city: Sofia
+      country: Bulgaria
+    tags: ["#show", "#kids", "#aliceinwonderland", "#ndk"]
+    url: https://www.ndk.bg/
+
+  - id: seasonal-bazar-art-club-diplomat
+    title: Seasonal Bazar
+    description: Елегантен коледен базар в уютната обстановка на Art Club Diplomat. Предлага внимателно подбрани ръчно изработени изделия, дизайнерски стоки, изкуство и празнични кулинарни изкушения.
+    start: 2026-12-19T11:00:00+02:00
+    end: 2026-12-20T19:00:00+02:00
+    location:
+      name: Art Club Diplomat
+      city: Sofia
+      country: Bulgaria
+    tags: ["#bazar", "#handmade", "#christmas", "#design"]
+    url: https://www.facebook.com/events/seasonal-bazar/
+
+  - id: home-alone-in-concert-2026
+    title: Сам вкъщи (Home Alone in Concert)
+    description: Уникално празнично преживяване – прожекция на вечната коледна комедия "Сам вкъщи", придружена от изпълнение на живо на оригиналната музика на Джон Уилямс от голям симфоничен оркестър.
+    start: 2026-12-26T19:00:00+02:00
+    end: 2026-12-26T21:30:00+02:00
+    location:
+      name: Национален дворец на културата (НДК), Зала 1
+      city: Sofia
+      country: Bulgaria
+    tags: ["#concert", "#movie", "#homealone", "#christmas"]
+    url: https://www.eventim.bg/bg/bileti/sam-vkshi-in-concert-sofiya-national-palace-of-culture-hall-1/
+
+  - id: new-year-operetta-ball-2026
+    title: Новогодишен оперетен бал
+    description: Бляскав празничен концерт-спектакъл, поднасящ най-известните арии и дуети, валсове и полки. Традиционно и елегантно събитие за изпращане на старата и посрещане на новата година.
+    start: 2026-12-28T19:00:00+02:00
+    end: 2026-12-28T21:30:00+02:00
+    location:
+      name: Национален дворец на културата (НДК), Зала 1
+      city: Sofia
+      country: Bulgaria
+    tags: ["#operetta", "#ball", "#newyear", "#ndk"]
+    url: https://www.ndk.bg/

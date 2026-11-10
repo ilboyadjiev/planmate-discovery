@@ -9,6 +9,8 @@
 #   time-zone: for times without one (default Europe/Berlin)
 #   location:  the venue (or just the city), for events whose own place is missing
 #   tags:      added to every event
+#   ignore-robots: true skips the robots.txt check for this one feed (default false). Only set it for a site whose
+#                  operator has separately allowed PlanMate to read it; it overrides the site's stated policy.
 #
 # Before adding a site: check that its terms allow it, that its robots.txt does (PlanMateBot follows it), that
 # the programme is in the page's HTML (not loaded later by JavaScript), and that it gives times, not only dates:

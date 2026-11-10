@@ -63,7 +63,7 @@ public class WebFeedSource implements EventSource {
 	@Override
 	public List<SourceEvent> fetch() throws Exception {
 		Instant now = clock.instant();
-		PageFetcher.Page page = fetcher.get(feed.url());
+		PageFetcher.Page page = fetcher.get(feed.url(), feed.ignoreRobots());
 		List<SourceEvent> events = read(page, now);
 		Instant from = now.minusSeconds(24 * 3600);
 		Instant to = now.plus(config.lookAhead());

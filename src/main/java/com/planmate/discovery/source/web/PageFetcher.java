@@ -66,8 +66,16 @@ public class PageFetcher {
 
 	/** The page at url; throws when robots.txt forbids it, the server answers with an error, or it is too big. */
 	public Page get(String url) throws IOException {
+		return get(url, false);
+	}
+
+	/**
+	 * The page at url. When ignoreRobots is true the robots.txt check is skipped (use only for a site the operator
+	 * has separately allowed); otherwise this throws when robots.txt forbids the page.
+	 */
+	public Page get(String url, boolean ignoreRobots) throws IOException {
 		URI uri = URI.create(url);
-		if (!rulesFor(uri).allows(pathOf(uri))) {
+		if (!ignoreRobots && !rulesFor(uri).allows(pathOf(uri))) {
 			throw new IOException("robots.txt of " + uri.getHost() + " does not allow PlanMateBot to read " + url);
 		}
 		return http.get().uri(uri)

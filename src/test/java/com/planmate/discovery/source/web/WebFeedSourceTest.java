@@ -3,6 +3,7 @@ package com.planmate.discovery.source.web;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -38,13 +39,13 @@ class WebFeedSourceTest {
 
 	private WebFeedSource source(String format, DiscoveryProperties.Feeds config) {
 		WebFeed feed = new WebFeed("venue", "Venue", "https://venue.example/programm", format, null,
-				WebFeedParsersTest.MUNICH_VENUE.location(), List.of());
+				WebFeedParsersTest.MUNICH_VENUE.location(), List.of(), false);
 		return new WebFeedSource(feed, config, fetcher, ai, NOW);
 	}
 
 	private void serves(String resource, MediaType type) throws Exception {
-		when(fetcher.get("https://venue.example/programm")).thenReturn(new PageFetcher.Page("https://venue.example/programm",
-				type, WebFeedParsersTest.resource(resource).getBytes(StandardCharsets.UTF_8)));
+		when(fetcher.get(eq("https://venue.example/programm"), anyBoolean())).thenReturn(new PageFetcher.Page(
+				"https://venue.example/programm", type, WebFeedParsersTest.resource(resource).getBytes(StandardCharsets.UTF_8)));
 	}
 
 	@Test
@@ -85,6 +86,19 @@ class WebFeedSourceTest {
 				.containsExactly("Jazz am Abend, live", "Talk");
 		assertThat(source(null, config(true, Duration.ofDays(10), 1)).fetch()).extracting(SourceEvent::title)
 				.containsExactly("Jazz am Abend, live");
+	}
+
+	@Test
+	void aFeedReadsWithRobotsEnforcedByDefaultButCanOptOut() throws Exception {
+		serves("venue.ics", MediaType.TEXT_PLAIN);
+
+		source(null, config(true, Duration.ofDays(120), 300)).fetch();
+		verify(fetcher).get("https://venue.example/programm", false);
+
+		WebFeed entitled = new WebFeed("venue", "Venue", "https://venue.example/programm", null, null,
+				WebFeedParsersTest.MUNICH_VENUE.location(), List.of(), true);
+		new WebFeedSource(entitled, config(true, Duration.ofDays(120), 300), fetcher, ai, NOW).fetch();
+		verify(fetcher).get("https://venue.example/programm", true);
 	}
 
 	@Test

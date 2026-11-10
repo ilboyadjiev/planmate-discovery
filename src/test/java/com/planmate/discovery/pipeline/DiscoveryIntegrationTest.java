@@ -411,7 +411,7 @@ class DiscoveryIntegrationTest {
 	@Test
 	void theAiReadsAPageOnlyWhenItsTextChangedAndWithinItsOwnDailyLimit() throws Exception {
 		WebFeed feed = new WebFeed("venue", "Venue", "https://venue.example/programm", "ai", null,
-				new Location("Venue", null, null, "Munich", "Germany"), List.of());
+				new Location("Venue", null, null, "Munich", "Germany"), List.of(), false);
 		java.util.function.Function<String, org.jsoup.nodes.Document> page = shows -> org.jsoup.Jsoup.parse(
 				"<main>" + shows + "</main>", "https://venue.example/programm");
 

@@ -19,7 +19,7 @@ import com.planmate.discovery.model.SourceEvent;
 class WebFeedParsersTest {
 
 	static final WebFeed MUNICH_VENUE = new WebFeed("venue", "Venue", "https://venue.example/programm", null, null,
-			new Location("Venue", "Hauptstraße 1", "80331", "Munich", "Germany"), List.of("#concert"));
+			new Location("Venue", "Hauptstraße 1", "80331", "Munich", "Germany"), List.of("#concert"), false);
 
 	static String resource(String name) throws IOException {
 		try (InputStream in = WebFeedParsersTest.class.getResourceAsStream("/web/" + name)) {
@@ -183,17 +183,17 @@ class WebFeedParsersTest {
 	@Test
 	void feedEntriesAreChecked() {
 		org.assertj.core.api.Assertions.assertThatThrownBy(
-				() -> new WebFeed("Bad Id", "X", "https://x.example", null, null, null, null).validate())
+				() -> new WebFeed("Bad Id", "X", "https://x.example", null, null, null, null, false).validate())
 				.hasMessageContaining("Bad Id");
 		org.assertj.core.api.Assertions.assertThatThrownBy(
-				() -> new WebFeed("ok", "X", "ftp://x.example", null, null, null, null).validate())
+				() -> new WebFeed("ok", "X", "ftp://x.example", null, null, null, null, false).validate())
 				.hasMessageContaining("http(s)");
 		org.assertj.core.api.Assertions.assertThatThrownBy(
-				() -> new WebFeed("ok", "X", "https://x.example", "pdf", null, null, null).validate())
+				() -> new WebFeed("ok", "X", "https://x.example", "pdf", null, null, null, false).validate())
 				.hasMessageContaining("format");
 		org.assertj.core.api.Assertions.assertThatThrownBy(
-				() -> new WebFeed("ok", "X", "https://x.example", null, "Mars/Olympus", null, null).validate())
+				() -> new WebFeed("ok", "X", "https://x.example", null, "Mars/Olympus", null, null, false).validate())
 				.hasMessageContaining("time zone");
-		new WebFeed("ok", "X", "https://x.example", "json-ld", "Europe/Sofia", null, null).validate();
+		new WebFeed("ok", "X", "https://x.example", "json-ld", "Europe/Sofia", null, null, false).validate();
 	}
 }
