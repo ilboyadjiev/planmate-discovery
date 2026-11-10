@@ -9,7 +9,10 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -28,11 +31,18 @@ import tools.jackson.databind.json.JsonMapper;
 class GeminiRefinerTest {
 
 	private static final DiscoveryProperties PROPS = new DiscoveryProperties(Duration.ofHours(24), 3, null,
-			new DiscoveryProperties.Ai(true, "AI-KEY", "gemini-test-model", "https://ai.example/v1beta", 15, 300,
-					Duration.ZERO, List.of(), "classpath:prompts/event-description-refinement-prompt.txt"),
+			new DiscoveryProperties.Ai(true, "AI-KEY", "gemini-test-model", List.of(), Duration.ofMinutes(15),
+					"https://ai.example/v1beta", 15, 300, Duration.ZERO, List.of(),
+					"classpath:prompts/event-description-refinement-prompt.txt"),
 			null, null);
 
 	private final JsonMapper json = JsonMapper.builder().build();
+	private final Clock clock = Clock.fixed(Instant.parse("2026-11-10T12:00:00Z"), ZoneOffset.UTC);
+
+	private GeminiRefiner refiner(RestClient.Builder builder) throws Exception {
+		GeminiClient client = new GeminiClient(PROPS, new GeminiModels(PROPS, clock), builder);
+		return new GeminiRefiner(new PromptTemplate(PROPS, new DefaultResourceLoader()), json, client);
+	}
 
 	@Test
 	void sendsThePromptAndTheEventsAndKeepsTheValidAnswers() throws Exception {
@@ -48,7 +58,7 @@ class GeminiRefinerTest {
 				.andRespond(withSuccess("{\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"" + answer + "\"}]}}]}",
 						MediaType.APPLICATION_JSON));
 
-		GeminiRefiner refiner = new GeminiRefiner(PROPS, new PromptTemplate(PROPS, new DefaultResourceLoader()), json, builder);
+		GeminiRefiner refiner = refiner(builder);
 		Map<String, Refiner.RefinedText> result = refiner.refine(List.of(
 				new RefinementInput("tm-1", "Jazz Night", "Live jazz", "Unterfahrt", "Munich", List.of("#concert"))));
 
@@ -61,7 +71,7 @@ class GeminiRefinerTest {
 		RestClient.Builder builder = RestClient.builder();
 		MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
 		server.expect(requestTo(org.hamcrest.Matchers.startsWith("https://ai.example"))).andRespond(withStatus(HttpStatus.TOO_MANY_REQUESTS));
-		GeminiRefiner refiner = new GeminiRefiner(PROPS, new PromptTemplate(PROPS, new DefaultResourceLoader()), json, builder);
+		GeminiRefiner refiner = refiner(builder);
 		assertThatThrownBy(() -> refiner.refine(List.of(new RefinementInput("a", "A", null, null, null, List.of()))))
 				.isInstanceOf(org.springframework.web.client.HttpClientErrorException.TooManyRequests.class);
 	}

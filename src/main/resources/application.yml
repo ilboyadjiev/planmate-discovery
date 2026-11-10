@@ -123,6 +123,12 @@ discovery:
     # Discovery's own free-tier key, separate from the backend's
     api-key: ${GEMINI_DISCOVERY_API_KEY:}
     model: ${GEMINI_DISCOVERY_MODEL:gemini-3.5-flash-lite}
+    # When the model above answers 429 (its quota is used up), fall back to these in order until one works. The
+    # rate-limited model is skipped for model-cooldown, then tried again (so a per-minute limit recovers in seconds
+    # and a daily one falls back for the day without dropping the preferred model). Comma-separated; empty = no
+    # fallback. Keep the list in quality order (best first); every id must be a model the key may call.
+    fallback-models: ${GEMINI_DISCOVERY_FALLBACK_MODELS:gemini-2.5-flash-lite,gemini-2.0-flash-lite}
+    model-cooldown: ${GEMINI_DISCOVERY_MODEL_COOLDOWN:15m}
     batch-size: 15
     # Gemini requests a day for descriptions (shares the free-tier quota with the feeds' AI page reads above)
     daily-limit: ${DISCOVERY_AI_DAILY_LIMIT:1000}

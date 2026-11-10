@@ -126,6 +126,11 @@ public record DiscoveryProperties(
 			@DefaultValue("true") boolean enabled,
 			String apiKey,
 			@DefaultValue("gemini-3.5-flash-lite") String model,
+			// Models to fall back to, in order, when a 429 says the one before has run out of quota.
+			List<String> fallbackModels,
+			// How long a model that answered 429 is skipped before it is tried again (so the preferred model
+			// comes back by itself once its per-minute or daily limit resets).
+			@DefaultValue("15m") Duration modelCooldown,
 			@DefaultValue("https://generativelanguage.googleapis.com/v1beta") String baseUrl,
 			@DefaultValue("15") int batchSize,
 			@DefaultValue("300") int dailyLimit,

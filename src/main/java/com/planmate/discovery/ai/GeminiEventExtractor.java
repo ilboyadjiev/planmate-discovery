@@ -7,11 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
-
-import com.planmate.discovery.config.DiscoveryProperties;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -25,16 +21,13 @@ public class GeminiEventExtractor implements EventExtractor {
 	static final String PROMPT = "classpath:prompts/event-extraction-prompt.txt";
 	private static final String[] FIELDS = { "title", "start", "end", "room", "venue", "address", "url", "description" };
 
-	private final DiscoveryProperties.Ai config;
 	private final JsonMapper json;
-	private final RestClient http;
+	private final GeminiClient client;
 	private final String prompt;
 
-	public GeminiEventExtractor(DiscoveryProperties properties, JsonMapper json, RestClient.Builder builder,
-			ResourceLoader resources) throws IOException {
-		this.config = properties.ai();
+	public GeminiEventExtractor(JsonMapper json, GeminiClient client, ResourceLoader resources) throws IOException {
 		this.json = json;
-		this.http = builder.clone().baseUrl(config.baseUrl()).build();
+		this.client = client;
 		try (InputStream in = resources.getResource(PROMPT).getInputStream()) {
 			this.prompt = new String(in.readAllBytes(), StandardCharsets.UTF_8).trim();
 		}
@@ -42,18 +35,7 @@ public class GeminiEventExtractor implements EventExtractor {
 
 	@Override
 	public List<Extracted> extract(Input input) {
-		JsonNode response = http.post()
-				.uri("/models/{model}:generateContent", config.model())
-				.header("x-goog-api-key", config.apiKey())
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(request(input))
-				.retrieve()
-				.body(JsonNode.class);
-		String text = response == null ? null
-				: response.path("candidates").path(0).path("content").path("parts").path(0).path("text").asString(null);
-		if (text == null || text.isBlank()) {
-			throw new IllegalStateException("Gemini returned no text");
-		}
+		String text = client.generate(request(input));
 		JsonNode answer = json.readTree(text);
 		if (!answer.isArray()) {
 			throw new IllegalStateException("Gemini did not answer with a list");
