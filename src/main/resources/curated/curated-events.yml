@@ -21,8 +21,248 @@
 #     description: Steam's big end-of-year sale with discounts across the store.
 #     start: 2026-12-18T19:00:00+01:00
 #     end: 2027-01-02T19:00:00+01:00
-#     location: { name: Online (Steam) }
+#     location:
+#       name: Online (Steam)
 #     tags: ["#gaming", "#sale"]
 #     url: https://store.steampowered.com
 
-events: []
+events:
+  - id: german-christmas-market-2026
+    title: Немският коледен базар
+    description: Най-старият коледен базар в града, разположен в сърцето на София. Предлага традиционни дървени къщички с немска храна, греяно вино, играчки, както и ежедневни представления и куклен театър.
+    start: 2026-11-14T11:00:00+02:00
+    end: 2026-12-21T22:00:00+02:00
+    location:
+      name: Градската градина до площад „Княз Александър I Батенберг“
+      city: Sofia
+      country: Bulgaria
+    tags: ["#christmas", "#market", "#sofia", "#gluhwein"]
+    url: https://www.makeyourtravell.com/bg/info/christmas-markets-sofia
+
+  - id: sofia-christmas-fest-2026
+    title: Sofia Christmas Fest пред НДК
+    description: По-големият базар в парка пред НДК, който предлага ръчно изработени подаръци, фермерски пазар, храна, напитки и музикална сцена.
+    start: 2026-11-20T11:00:00+02:00
+    end: 2026-12-28T22:00:00+02:00
+    location:
+      name: Парк пред Националния дворец на културата (НДК)
+      city: Sofia
+      country: Bulgaria
+    tags: ["#christmas", "#market", "#festival", "#ndk"]
+    url: https://dbr.bg/sofia-christmas-fest-2026-tarsat-fermeri-za-kolednia-bazar-pred-ndk~26169.html
+
+  - id: sofia-christmas-fest-ice-rink
+    title: Sofia Christmas Fest на Лед
+    description: Открита ледена пързалка, която е част от фестивала пред НДК. Сесиите за каране на кънки продължават по 45 минути и носят много празнично настроение на посетителите.
+    start: 2026-11-20T11:00:00+02:00
+    end: 2026-12-28T23:00:00+02:00
+    location:
+      name: Парк пред Националния дворец на културата (НДК)
+      city: Sofia
+      country: Bulgaria
+    tags: ["#icerink", "#christmas", "#iceskating", "#sofia"]
+    url: https://www.eventim.bg/city/%D1%81%D0%BE%D1%84%D0%B8%D1%8F-7510////next-month/
+
+  - id: vienna-schonbrunn-orchestra-2026
+    title: Коледен „Златен концерт“ на Vienna Schönbrunn Orchestra
+    description: Празничен класически концерт на известния виенски оркестър, гостуващ в Зала 1 на НДК за специално коледно изпълнение.
+    start: 2026-12-15T18:30:00+02:00
+    end: 2026-12-15T21:00:00+02:00
+    location:
+      name: НДК, Зала 1
+      city: Sofia
+      country: Bulgaria
+    tags: ["#concert", "#classic", "#vienna", "#christmas"]
+    url: https://aroundyou-bg.com/blog/koledni-koncerti/
+
+  - id: golyam-praz-ndk-2026
+    title: Голям праз – Празнично комедийно шоу
+    description: Празнично комедийно шоу и спектакъл, събиращ любители на хумора в дните преди Коледа.
+    start: 2026-12-18T19:30:00+02:00
+    end: 2026-12-18T21:30:00+02:00
+    location:
+      name: НДК, Зала 1
+      city: Sofia
+      country: Bulgaria
+    tags: ["#comedy", "#show", "#holiday", "#sofia"]
+    url: https://aroundyou-bg.com/blog/koledni-praznici/
+
+  - id: strauss-capelle-vienna
+    title: STRAUSS CAPELLE VIENNA - НАЙ-ДОБРОТО ОТ ЩРАУС
+    description: Зимен класически концерт с най-добрите произведения на Щраус, който носи духа на предстоящите празници.
+    start: 2026-12-01T19:00:00+02:00
+    end: 2026-12-01T21:00:00+02:00
+    location:
+      name: НДК, Зала 1
+      city: Sofia
+      country: Bulgaria
+    tags: ["#strauss", "#concert", "#classicmusic", "#sofia"]
+    url: https://www.eventim.bg/city/%D1%81%D0%BE%D1%84%D0%B8%D1%8F-7510////next-month/
+
+  - id: nutcracker-ballet-dec4
+    title: Лешникотрошачката - Балет (4 Декември)
+    description: Класическият коледен балет от П. И. Чайковски, изпълнен от Софийска опера и балет. Любима празнична традиция за цялото семейство.
+    start: 2026-12-04T19:00:00+02:00
+    end: 2026-12-04T21:00:00+02:00
+    location:
+      name: Софийска опера и балет, Голяма зрителна зала
+      city: Sofia
+      country: Bulgaria
+    tags: ["#ballet", "#nutcracker", "#christmas", "#tchaikovsky"]
+    url: https://www.operasofia.bg/repertoire/1073
+
+  - id: nutcracker-ballet-dec18-morning
+    title: Лешникотрошачката - Балет (18 Декември, сутрин)
+    description: Сутрешно представление на обичания празничен балет "Лешникотрошачката" от Чайковски.
+    start: 2026-12-18T11:00:00+02:00
+    end: 2026-12-18T13:00:00+02:00
+    location:
+      name: Софийска опера и балет, Голяма зрителна зала
+      city: Sofia
+      country: Bulgaria
+    tags: ["#ballet", "#nutcracker", "#christmas", "#tchaikovsky"]
+    url: https://www.operasofia.bg/repertoire/1073
+
+  - id: nutcracker-ballet-dec18-evening
+    title: Лешникотрошачката - Балет (18 Декември, вечер)
+    description: Вечерно представление на коледната балетна класика "Лешникотрошачката". Билетите за това събитие традиционно се разпродават изключително бързо.
+    start: 2026-12-18T19:00:00+02:00
+    end: 2026-12-18T21:00:00+02:00
+    location:
+      name: Софийска опера и балет, Голяма зрителна зала
+      city: Sofia
+      country: Bulgaria
+    tags: ["#ballet", "#nutcracker", "#christmas", "#evening"]
+    url: https://www.operasofia.bg/repertoire/1073
+
+  - id: nutcracker-ballet-dec22-afternoon
+    title: Лешникотрошачката - Балет (22 Декември, следобед)
+    description: Следобедно изпълнение на приказната история за Клара и нейния лешникотрошач.
+    start: 2026-12-22T14:00:00+02:00
+    end: 2026-12-22T16:00:00+02:00
+    location:
+      name: Софийска опера и балет, Голяма зрителна зала
+      city: Sofia
+      country: Bulgaria
+    tags: ["#ballet", "#nutcracker", "#christmas", "#tchaikovsky"]
+    url: https://www.operasofia.bg/repertoire/1073
+
+  - id: nutcracker-ballet-dec22-evening
+    title: Лешникотрошачката - Балет (22 Декември, вечер)
+    description: Празнично вечерно представление на емблематичния балет преди Коледа.
+    start: 2026-12-22T19:00:00+02:00
+    end: 2026-12-22T21:00:00+02:00
+    location:
+      name: Софийска опера и балет, Голяма зрителна зала
+      city: Sofia
+      country: Bulgaria
+    tags: ["#ballet", "#nutcracker", "#christmas", "#tchaikovsky"]
+    url: https://www.operasofia.bg/repertoire/1073
+
+  - id: nutcracker-ballet-dec23-afternoon
+    title: Лешникотрошачката - Балет (23 Декември, следобед)
+    description: Изпълнение в деня преди Бъдни вечер на сцената на Софийската опера и балет.
+    start: 2026-12-23T14:00:00+02:00
+    end: 2026-12-23T16:00:00+02:00
+    location:
+      name: Софийска опера и балет, Голяма зрителна зала
+      city: Sofia
+      country: Bulgaria
+    tags: ["#ballet", "#nutcracker", "#christmas", "#tchaikovsky"]
+    url: https://www.operasofia.bg/repertoire/1073
+
+  - id: nutcracker-ballet-dec23-evening
+    title: Лешникотрошачката - Балет (23 Декември, вечер)
+    description: Празнично изпълнение на "Лешникотрошачката" в навечерието на Коледа.
+    start: 2026-12-23T19:00:00+02:00
+    end: 2026-12-23T21:00:00+02:00
+    location:
+      name: Софийска опера и балет, Голяма зрителна зала
+      city: Sofia
+      country: Bulgaria
+    tags: ["#ballet", "#nutcracker", "#christmas", "#tchaikovsky"]
+    url: https://www.operasofia.bg/repertoire/1073
+
+  - id: nutcracker-ballet-dec26
+    title: Лешникотрошачката - Балет (26 Декември)
+    description: Традиционно представление на балета навръх втория ден на Коледа.
+    start: 2026-12-26T11:00:00+02:00
+    end: 2026-12-26T13:00:00+02:00
+    location:
+      name: Софийска опера и балет, Голяма зрителна зала
+      city: Sofia
+      country: Bulgaria
+    tags: ["#ballet", "#nutcracker", "#christmas", "#tchaikovsky"]
+    url: https://www.operasofia.bg/repertoire/1073
+
+  - id: christmas-kids-movies-filharmonic
+    title: Коледа в детските филми
+    description: Специален празничен концерт на Софийската филхармония с музика от любими детски и коледни филми.
+    start: 2026-12-20T17:00:00+02:00
+    end: 2026-12-20T19:00:00+02:00
+    location:
+      name: Зала България
+      city: Sofia
+      country: Bulgaria
+    tags: ["#concert", "#kids", "#movies", "#christmas"]
+    url: https://www.eventim.bg/event/%D0%BA%D0%BE%D0%BB%D0%B5%D0%B4%D0%B0-%D0%B2-%D0%B4%D0%B5%D1%82%D1%81%D0%BA%D0%B8%D1%82%D0%B5-%D1%84%D0%B8%D0%BB%D0%BC%D0%B8-%D0%B7%D0%B0%D0%BB%D0%B0-%D0%B1%D1%8A%D0%BB%D0%B3%D0%B0%D1%80%D0%B8%D1%8F-21776110/
+
+  - id: white-christmas-lucy-dyakovska
+    title: БЯЛА КОЛЕДА - Празничен концерт с Люси Дяковска
+    description: Голям празничен концерт "Бяла Коледа" в изпълнение на поп звездата Люси Дяковска и симфоничен оркестър.
+    start: 2026-12-22T19:00:00+02:00
+    end: 2026-12-22T21:30:00+02:00
+    location:
+      name: Зала България
+      city: Sofia
+      country: Bulgaria
+    tags: ["#concert", "#lucydyakovska", "#whitechristmas", "#sofia"]
+    url: https://www.eventim.bg/event/%D0%B1%D1%8F%D0%BB%D0%B0-%D0%BA%D0%BE%D0%BB%D0%B5%D0%B4%D0%B0-%D0%B7%D0%B0%D0%BB%D0%B0-%D0%B1%D1%8A%D0%BB%D0%B3%D0%B0%D1%80%D0%B8%D1%8F-22298327/
+
+  - id: fairytale-christmas-operetta
+    title: Приказна коледа в оперетата
+    description: Традиционен коледен концерт на Националния музикален театър, който съчетава най-популярните произведения от оперетата, мюзикъла и балета с любими празнични коледни песни.
+    start: 2026-12-23T19:00:00+02:00
+    end: 2026-12-23T20:30:00+02:00
+    location:
+      name: Национален музикален театър
+      city: Sofia
+      country: Bulgaria
+    tags: ["#operetta", "#musical", "#christmas", "#fairytale"]
+    url: https://kulturnomie.com/event/46358/prikazna-koleda-v-operetata
+
+  - id: miro-christmas-concert
+    title: МИРО - Коледен концерт
+    description: Коледен поп концерт на Миро в Зала 1 на НДК. Музикална среща за споделяне на емоции, любими песни и вълшебството, което носи Коледа.
+    start: 2026-12-18T20:00:00+02:00
+    end: 2026-12-18T22:30:00+02:00
+    location:
+      name: НДК, Зала 1
+      city: Sofia
+      country: Bulgaria
+    tags: ["#miro", "#pop", "#christmas", "#concert"]
+    url: https://www.ndk.bg/bg/sabitie/miro-koleden-koncert
+
+  - id: christmas-run-3k
+    title: Run and Become Коледно бягане 3K
+    description: Празнично спортно състезание и коледно бягане на открито в Южния парк, идеално за забавление и спорт по време на празниците.
+    start: 2026-12-27T10:00:00+02:00
+    end: 2026-12-27T12:00:00+02:00
+    location:
+      name: Южен Парк
+      city: Sofia
+      country: Bulgaria
+    tags: ["#run", "#sports", "#christmasrun", "#sofia"]
+    url: https://aroundyou-bg.com/blog/koledni-praznici/
+
+  - id: miracles-of-music-christmas
+    title: Интерактивен концерт „Чудесата на музиката“
+    description: Вълнуващо музикално приключение за малки откриватели, подходящо за предколедния период, съчетаващо класическа музика с игри и магия.
+    start: 2026-11-14T11:00:00+02:00
+    end: 2026-11-14T12:00:00+02:00
+    location:
+      name: Софийска опера и балет
+      city: Sofia
+      country: Bulgaria
+    tags: ["#kids", "#interactive", "#music", "#sofia"]
+    url: https://sofia.plays.bg/events/by-category/3music
