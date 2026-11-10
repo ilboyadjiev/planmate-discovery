@@ -7,6 +7,10 @@
         "url": "https://www.ticketmaster.de/event/jazz-night",
         "info": "Doors open at 18:30.",
         "pleaseNote": "No re-entry.",
+        "images": [
+          { "url": "https://img.ticketmaster.de/jazz-small.jpg", "width": 305, "height": 203 },
+          { "url": "https://img.ticketmaster.de/jazz-large.jpg", "width": 2048, "height": 1152 }
+        ],
         "dates": {
           "start": { "localDate": "2026-11-20", "localTime": "19:00:00", "dateTime": "2026-11-20T18:00:00Z" },
           "timezone": "Europe/Berlin",

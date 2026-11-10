@@ -29,7 +29,13 @@ class RefinementValidatorTest {
 	void theAllowedTagsComeFromThePromptItself() throws Exception {
 		String prompt = new ClassPathResource("prompts/event-description-refinement-prompt.txt").getContentAsString(StandardCharsets.UTF_8);
 		Set<String> tags = PromptTemplate.parseAllowedTags(prompt);
-		assertThat(tags).contains("#munich", "#christmasmarket", "#tradition").hasSize(31).allMatch(t -> t.startsWith("#"));
+		// Don't hardcode the catalogue size (it grows as tags are added): count the #tags on the prompt's
+		// "Allowed tags:" line independently and assert the parser returned exactly those, well-formed.
+		long onPromptLine = prompt.lines().filter(l -> l.startsWith("Allowed tags:"))
+				.flatMap(l -> java.util.Arrays.stream(l.substring("Allowed tags:".length()).split(",")))
+				.map(String::trim).filter(t -> t.startsWith("#")).distinct().count();
+		assertThat(tags).contains("#munich", "#christmasmarket", "#tradition")
+				.hasSize((int) onPromptLine).allMatch(t -> t.matches("#[a-z]+"));
 	}
 
 	@Test

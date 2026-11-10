@@ -32,6 +32,7 @@ public record EventMessage(String type, String eventId, long version, Instant oc
 			String source,
 			String sourceName,
 			String sourceUrl,
+			String imageUrl,
 			boolean cancelled) {
 	}
 }

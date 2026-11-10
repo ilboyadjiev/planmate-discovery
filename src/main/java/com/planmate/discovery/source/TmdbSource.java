@@ -43,6 +43,8 @@ public class TmdbSource implements EventSource {
 
 	private static final Logger log = LoggerFactory.getLogger(TmdbSource.class);
 	static final String MOVIE_PAGE = "https://www.themoviedb.org/movie/";
+	/** TMDB's image CDN; w780 is a good width for a feed card. */
+	static final String IMAGE_BASE = "https://image.tmdb.org/t/p/w780";
 	static final int PAGE_SIZE = 20;
 	static final int MAX_DESCRIPTION = 2000;
 	/** TMDB release types: 3 theatrical, 2 limited theatrical. */
@@ -185,7 +187,16 @@ public class TmdbSource implements EventSource {
 		return new SourceEvent(region.code().toLowerCase(Locale.ROOT) + "-" + movie.path("id").asLong(), title,
 				text.isEmpty() ? null : text, start, end,
 				new Location("Cinemas in " + region.city(), null, null, region.city(), region.country()),
-				List.of("#film", "#release"), MOVIE_PAGE + movie.path("id").asLong(), false);
+				List.of("#film", "#release"), MOVIE_PAGE + movie.path("id").asLong(), false, image(movie));
+	}
+
+	/** The film's poster (its backdrop is wider but often missing), as a full TMDB image URL; null when none. */
+	static String image(JsonNode movie) {
+		String path = text(movie, "poster_path");
+		if (path == null) {
+			path = text(movie, "backdrop_path");
+		}
+		return path == null ? null : IMAGE_BASE + path;
 	}
 
 	/** Its first cinema release in the region within [from, to]: theatrical, else limited theatrical. */

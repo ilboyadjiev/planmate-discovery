@@ -283,7 +283,7 @@ public class DiscoveryPipeline {
 		}
 		return new EventMessage(type, tracked.getId(), tracked.getVersion(), now,
 				new EventMessage.Event(tracked.getId(), e.title(), description, e.startTime(), endTime, e.location(),
-						tags, source.id(), source.displayName(), e.url(), change == ChangeType.CANCELLED));
+						tags, source.id(), source.displayName(), e.url(), e.imageUrl(), change == ChangeType.CANCELLED));
 	}
 
 	/** Adds a short note that the end time was estimated because the source gave none. */

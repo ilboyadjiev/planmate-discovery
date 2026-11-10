@@ -30,7 +30,7 @@ public class CuratedYamlSource implements EventSource {
 	}
 
 	record Entry(String id, String title, String description, String start, String end, Location location,
-			List<String> tags, String url, Boolean cancelled) {
+			List<String> tags, String url, Boolean cancelled, String image) {
 	}
 
 	private static final YAMLMapper YAML = YAMLMapper.builder()
@@ -89,7 +89,8 @@ public class CuratedYamlSource implements EventSource {
 				throw new IllegalArgumentException("Curated event " + e.id() + " ends before it starts");
 			}
 			events.add(new SourceEvent(e.id(), e.title().trim(), e.description() == null ? null : e.description().trim(),
-					start, end, e.location(), e.tags(), e.url(), Boolean.TRUE.equals(e.cancelled())));
+					start, end, e.location(), e.tags(), e.url(), Boolean.TRUE.equals(e.cancelled()),
+					e.image() == null || e.image().isBlank() ? null : e.image().trim()));
 		}
 		return events;
 	}

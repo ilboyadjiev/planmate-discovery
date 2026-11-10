@@ -26,7 +26,7 @@ public final class ContentHasher {
 		Location l = e.location();
 		return sha256(join(e.title(), e.description(), e.startTime(), e.endTime(),
 				l == null ? null : join(l.name(), l.street(), l.zipcode(), l.city(), l.country()),
-				String.join(",", new TreeSet<>(e.tags())), e.url(), e.cancelledAtSource()));
+				String.join(",", new TreeSet<>(e.tags())), e.url(), e.cancelledAtSource(), e.imageUrl()));
 	}
 
 	/** Only what the AI writes from: title and description. */

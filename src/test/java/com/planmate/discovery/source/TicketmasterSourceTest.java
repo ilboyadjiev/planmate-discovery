@@ -68,6 +68,7 @@ class TicketmasterSourceTest {
 		assertThat(jazz.location().city()).isEqualTo("München");
 		assertThat(jazz.tags()).containsExactly("#concert");
 		assertThat(jazz.url()).isEqualTo("https://www.ticketmaster.de/event/jazz-night");
+		assertThat(jazz.imageUrl()).as("the widest image is chosen").isEqualTo("https://img.ticketmaster.de/jazz-large.jpg");
 		assertThat(jazz.cancelledAtSource()).isFalse();
 
 		SourceEvent cancelled = events.get(1);

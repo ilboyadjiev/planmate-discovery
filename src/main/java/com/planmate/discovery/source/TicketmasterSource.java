@@ -148,7 +148,22 @@ public class TicketmasterSource implements EventSource {
 		boolean cancelled = "cancelled".equalsIgnoreCase(text(dates.path("status"), "code"));
 		return new SourceEvent(id, name, description.isEmpty() ? null : description, start,
 				end != null && end.isAfter(start) ? end : null, venue(e.path("_embedded").path("venues").path(0)),
-				tags(e), text(e, "url"), cancelled);
+				tags(e), text(e, "url"), cancelled, image(e));
+	}
+
+	/** The widest of Ticketmaster's images (it offers several crops); null when there are none. */
+	static String image(JsonNode e) {
+		String best = null;
+		int widest = 0;
+		for (JsonNode img : e.path("images")) {
+			String url = text(img, "url");
+			int width = img.path("width").asInt(0);
+			if (url != null && width >= widest) {
+				widest = width;
+				best = url;
+			}
+		}
+		return best;
 	}
 
 	/** dateTime (UTC) when Ticketmaster gives one, else the local date and time in the event's time zone. */
