@@ -133,7 +133,7 @@ public record DiscoveryProperties(
 			@DefaultValue("15m") Duration modelCooldown,
 			@DefaultValue("https://generativelanguage.googleapis.com/v1beta") String baseUrl,
 			@DefaultValue("15") int batchSize,
-			@DefaultValue("300") int dailyLimit,
+			@DefaultValue("3000") int dailyLimit,
 			@DefaultValue("5s") Duration pauseBetweenRequests,
 			@DefaultValue({ "10s", "30s" }) List<Duration> retryDelays,
 			@DefaultValue("classpath:prompts/event-description-refinement-prompt.txt") String prompt) {

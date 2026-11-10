@@ -130,8 +130,10 @@ discovery:
     fallback-models: ${GEMINI_DISCOVERY_FALLBACK_MODELS:gemini-2.5-flash-lite,gemini-2.0-flash-lite}
     model-cooldown: ${GEMINI_DISCOVERY_MODEL_COOLDOWN:15m}
     batch-size: 15
-    # Gemini requests a day for descriptions (shares the free-tier quota with the feeds' AI page reads above)
-    daily-limit: ${DISCOVERY_AI_DAILY_LIMIT:1000}
+    # Events a day the AI may describe. Events go 15 to a request (batch-size), so 3000 events is ~200 requests;
+    # with the fallback chain each model adds its own free-tier daily quota, so the headroom is well above that.
+    # Shares the real free-tier quota with the feeds' AI page reads above (a separate counter, 400 requests/day).
+    daily-limit: ${DISCOVERY_AI_DAILY_LIMIT:3000}
     pause-between-requests: 5s
     # When Gemini is overloaded or rate-limited: ask again after 10s, then 30s, then leave it for the next run
     retry-delays: 10s, 30s
