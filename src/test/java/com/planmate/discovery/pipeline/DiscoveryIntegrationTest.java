@@ -242,10 +242,13 @@ class DiscoveryIntegrationTest {
 		JsonNode jazz = message(first.stream().filter(r -> r.key().equals("test-1")).findFirst().orElseThrow());
 		assertThat(jazz.path("type").asString()).isEqualTo("EventDiscovered");
 		assertThat(jazz.path("version").asLong()).isEqualTo(1);
-		assertThat(jazz.path("event").path("description").asString()).isEqualTo("Refined: Jazz Night\n\nTip: Book ahead");
+		assertThat(jazz.path("event").path("description").asString())
+				.isEqualTo("Refined: Jazz Night\n\nTip: Book ahead\n\nDuration auto-estimated.");
 		assertThat(jazz.path("event").path("tags").toString()).isEqualTo("[\"#concert\",\"#munich\"]");
 		assertThat(jazz.path("event").path("sourceName").asString()).isEqualTo("Test Source");
 		assertThat(jazz.path("event").path("startTime").asString()).isEqualTo("2026-11-20T18:00:00Z");
+		// The source gave no end time, so discovery publishes an estimated end (start + 3h) and notes it above
+		assertThat(jazz.path("event").path("endTime").asString()).isEqualTo("2026-11-20T21:00:00Z");
 		assertThat(ai.calls.get()).isEqualTo(1);
 		assertThat(ai.events.get()).isEqualTo(2);
 
@@ -323,7 +326,8 @@ class DiscoveryIntegrationTest {
 		ai.failing = true;
 		source.events.add(event("1", "Jazz Night", "Live   jazz\twith friends.", "2026-11-20T18:00:00Z"));
 		List<ConsumerRecord<String, String>> first = runAndPublish();
-		assertThat(message(first.get(0)).path("event").path("description").asString()).isEqualTo("Live jazz with friends.");
+		assertThat(message(first.get(0)).path("event").path("description").asString())
+				.isEqualTo("Live jazz with friends.\n\nDuration auto-estimated.");
 		assertThat(message(first.get(0)).path("event").path("tags").toString()).isEqualTo("[\"#jazz\"]");
 		assertThat(mongoTemplate.findById("test-1", TrackedEvent.class).isRefinementPending()).isTrue();
 

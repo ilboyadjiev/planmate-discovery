@@ -273,9 +273,23 @@ public class DiscoveryPipeline {
 		boolean current = refined != null && refined.forTextHash().equals(ContentHasher.textHash(e));
 		String description = current ? refined.descriptionWithTips() : fallbackDescription(e.description());
 		List<String> tags = current ? refined.tags() : normalisedTags(e.tags());
+		// The source gave no end time (common for AI-read web feeds): publish an estimated end — start + 3h, the same
+		// span the lifecycle logic already assumes via SourceEvent.endsAt() — so the event has a duration in the
+		// calendar and feed, and note in the description that it was estimated.
+		Instant endTime = e.endTime();
+		if (endTime == null && e.startTime() != null) {
+			endTime = e.endsAt();
+			description = withEstimatedDurationNote(description);
+		}
 		return new EventMessage(type, tracked.getId(), tracked.getVersion(), now,
-				new EventMessage.Event(tracked.getId(), e.title(), description, e.startTime(), e.endTime(), e.location(),
+				new EventMessage.Event(tracked.getId(), e.title(), description, e.startTime(), endTime, e.location(),
 						tags, source.id(), source.displayName(), e.url(), change == ChangeType.CANCELLED));
+	}
+
+	/** Adds a short note that the end time was estimated because the source gave none. */
+	static String withEstimatedDurationNote(String description) {
+		String note = "Duration auto-estimated.";
+		return description == null || description.isBlank() ? note : description + "\n\n" + note;
 	}
 
 	/** The source's own text when the AI did not write one: tidied up and cut at a word near 600 characters. */
