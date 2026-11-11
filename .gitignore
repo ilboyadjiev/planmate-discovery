@@ -5,3 +5,7 @@ target/
 .vscode/
 .DS_Store
 .env
+logs/*
+*.jar
+docs/*
+mongo-init/*
